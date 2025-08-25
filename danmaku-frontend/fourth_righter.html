@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Fourth Righter</title>
+        <style>
+            #omikuji {display: none;}
+        </style>
+    </head>
+    <body>
+        <div id="main_content">
+            <button onclick="sendMsg()">发送消息</button>
+            <div id="log"></div>
+            1333333321413
+        </div>
+    </body>
+    <script>
+        const ws = new WebSocket("ws://localhost:8080");
+
+        ws.onopen = () => log("✅ 已连接");
+        ws.onmessage = (e) => log("📩 " + e.data);
+        ws.onclose = () => log("❌ 连接关闭");
+        ws.onerror = (err) => log("⚠️ 出错: " + err);
+
+        function sendMsg() {
+            ws.send("Hello from Browser!");
+            log("➡️ 发送: Hello from Browser!");
+        }
+
+        function log(msg) {
+            document.getElementById("log").innerHTML += msg + "<br>";
+        }
+    </script>
+</html>

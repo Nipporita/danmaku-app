@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.7.1.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/template.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/hideSidebar.css">
+        <script src="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/login.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/hideHeader.css">
+    </head>
+    <body>
+    </body>
+    <script>
+        
+        const content_url = "/fourth_righter.html"
+
+        var templateRequest = $.ajax({
+            url: 'https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/template.html',
+        });
+        
+        var contentRequest = $.ajax({
+            url: content_url,
+        });
+        
+        var loginCheckRequest = login_check()
+
+        Promise.allSettled([templateRequest, contentRequest, loginCheckRequest]).then(function (results) {
+            if (results[0].status === 'fulfilled' && results[1].status === 'fulfilled') {
+
+                var template = results[0].value;
+                var content = results[1].value;
+
+                templateDOM = new DOMParser().parseFromString(template, "text/html");
+                contentDOM = new DOMParser().parseFromString(content, "text/html");
+
+                var toLoginElement = templateDOM.getElementById("to_login");
+                var hasLoginElement = templateDOM.getElementById("has_login");
+
+                // 处理登陆问题
+                do_after_login_check(templateDOM, contentDOM, results[2])
+
+                // 获取模板和内容的 head
+                var templateHead = templateDOM.querySelector('head');
+                var contentHead = contentDOM.querySelector('head');
+
+                // 将模板和内容的 head 添加到 final.html 的 head
+                document.head.appendChild(templateHead);
+                document.head.appendChild(contentHead);
+
+                // 获取内容中的 #main_content 和 footer
+                var nonScriptElements = templateDOM.querySelectorAll("body > :not(script)");
+
+                nonScriptElements.forEach(function (element) {
+                    document.body.appendChild(element);
+                });
+
+                var mainContent = contentDOM.querySelector('#main_content');
+                var afterContent = contentDOM.querySelector('#after_content');
+                var footerContent = contentDOM.querySelector('footer');
+
+                var templateScripts = templateDOM.querySelectorAll('body > script');
+                var contentScripts = contentDOM.querySelectorAll('body > script');
+                var allScripts = [...templateScripts, ...contentScripts];
+
+                $(mainContent).ready(function () {
+                    mainContent.classList.add("on_load");
+                    loadScriptsSequentially(allScripts, 0);
+                });
+
+                // 将 #main_content 插入到 final.html 的 #content_wrap
+                document.querySelector('#main_content_container').appendChild(mainContent);
+                if (afterContent) {
+                    document.querySelector('#content_wrap').appendChild(afterContent);
+                }
+
+                // 将 footer 插入到 final.html 的 #footer_wrap
+                if (footerContent) {
+                    document.querySelector('#footer_wrap').appendChild(footerContent);
+                }}
+        })
+        
+        function loadScriptsSequentially(scripts, index) {
+            if (index < scripts.length) {
+                var script = scripts[index];
+                var sc = document.createElement('script');
+                if (script.src !== '') {
+                    sc.src = script.src;
+                    sc.onload = function() {
+                        loadScriptsSequentially(scripts, index + 1);
+                    };
+                } else {
+                    sc.text = script.text;
+                    loadScriptsSequentially(scripts, index + 1);
+                }
+                sc.type = "text/javascript";
+                document.body.appendChild(sc);
+            }
+        }
+    </script>
+</html>
