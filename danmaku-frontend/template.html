@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset = "utf-8">
+        <meta name="viewport" content="width=device-width initial-scale=1">
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+        <title>幻想指南</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css" />
+        <!-- Lite version -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+        <!-- TC version -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-tc-webfont@1.0.0/style.css" />
+        <!-- Screen version -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
+        <link rel="manifest" href="/images/favicon/site.webmanifest">
+        <!-- <link rel="stylesheet" href="/template/newyear.css"> -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/normal.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/abnormal.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/particle.css">
+        <style>
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <header id="header">
+                <div class="header_content">
+                    <h1>幻想指南</h1>
+                    <h3 id="AQ">距離阿求的寿命完全枯竭，還有?天</h3>
+                </div>
+                <div class="mobile_header">
+                    <div id="open_menu" class="open_menu">
+                        <a href="#main_side_bar">☰</a>
+                    </div>
+                </div>
+                <div id="login_template" class="login_wrap">
+                    <div id="to_login">
+                        <a id="header_to_register" class="login_link">注册</a>
+                        <hr>
+                        <a id="header_to_login" class="login_link">登录</a>
+                    </div>
+                    <div id="has_login" style="display:none">
+                        <div class="login_content">
+                            <div class="user_profile">
+                                <img src="/backend/login/get_user_pic">
+                            </div>
+                            <div class="user_menu">
+                                <div class="user_menu_block"><div id="username_block"></div></div>
+                                <div class="user_menu_block"><a href="/homepage/">个人<br>空间</a></div>
+                                <div class="user_menu_block"><a onclick="logout()" class="login_link">注销</a></div>
+                                <!--<div class="user_menu_block"></div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="nav_bar">
+                    <a onclick="changeMode(this)" class="button" title="切换主题"></a>
+                    <ul>
+                        <li><a href="/">主页</a></li>
+                        <li><a href="/about/">关于</a></li>
+                        <li><a href="/medle/">Medle</a></li>
+                        <li><a href="/color_it_up/">填色游戏</a></li>
+                    </ul>
+                </div>
+            </header>
+            <div id="omikuji" class="omikuji_wrap">
+                <div class="omikuji_number_wrap">
+                    <div class="omikuji_number">
+                        <div id="omikuji_di" class="omikuji_hanzi omikuji_bangou">
+                            第
+                        </div>
+                        <div id="omikuji_num" class="omikuji_hanzi omikuji_bangou"></div>
+                        <div id="omikuji_fan" class="omikuji_hanzi omikuji_bangou">
+                            番
+                        </div>
+                        <div id="omikuji_yu" class="omikuji_hanzi omikuji_omikuji">
+                            御
+                        </div>
+                        <div id="omikuji_shen" class="omikuji_hanzi omikuji_omikuji">
+                            神
+                        </div>
+                        <div id="omikuji_qian" class="omikuji_hanzi omikuji_omikuji">
+                            籤
+                        </div>
+                    </div>
+                </div>
+                <div class="omikuji_content_wrap">
+                    <div class="omikuji_content_left_right_border_1">
+                        <div class="omikuji_content_left_right_border_2">
+                            <div class="omikuji_content_up_bottom_border_1">
+                                <div class="omikuji_content_up_bottom_border_2">
+                                    <div id="omikuji_basic">
+                                        <div id="omikuji_bangou_wrap">
+                                            <div id="omikuji_bangou"></div>
+                                            <div id="omikuji_fortune"></div>
+                                        </div>
+                                        <div id="omikuji_name_wrap">
+                                            <div id="omikuji_title"></div>
+                                            <div id="omikuji_name"></div>
+                                            <div id="omikuji_ability"></div>
+                                        </div>
+                                    </div>
+                                    <div id="omikuji_poem">
+                                        <!-- ＫＯきざはし金陵Ｂ Bold -->
+                                    </div>
+                                    <hr>
+                                    <div id="omikuji_fortune_text">
+                                        <div id="omikuji_fortune_text_1"></div>
+                                        <hr>
+                                        <div id="omikuji_fortune_text_2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a id="omikuji_show" class="button" onclick="showOmikuji()" style="display:block;"></a>
+                <a id="omikuji_hide" class="button" onclick="hideOmikuji()" style="display:none;"></a>
+            </div>
+            <div id="content_wrap">
+                <div id="main_side_bar">
+                    <div class="fantasy_guide_div_1">
+                        <h1>NEWS</h1>
+                        <a class="closed_yin_yang"><hr></a>
+                        <div class="main_content_container">
+                            <div class="main_content_content">
+                                <div id="news_content" class="inside_side_bar_container">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fantasy_guide_div_1">
+                        <h1>DAILY</h1>
+                        <a class="closed_yin_yang"><hr></a>
+                        <div class="main_content_container">
+                            <div class="main_content_content">
+                                <div class="inside_side_bar_container">
+                                    <div class="daily_content">
+                                        <h2>1、每日推荐音乐</h2>
+                                        <div id="wyy_iframe_container">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fantasy_guide_div_1">
+                        <h1>PROJECT</h1>
+                        <a class="closed_yin_yang"><hr></a>
+                        <div class="main_content_container">
+                            <div class="main_content_content">
+                                <div class="inside_side_bar_container">
+                                    <ul class="about_link">
+                                        <li><a href="https://fantasyguide.cn/medle" target="_blank"><span>Medle</span></a></li>
+                                        <li><a href="/color_it_up/"><span>填色游戏</span></a></li>
+                                    </ul>
+                                    <div class="medle_content" style="display: none">
+                                        <h2>1、Medle</h2>
+                                        <a href="https://fantasyguide.cn/medle/" target="_blank">点此体验</a>
+                                        给定一句歌的节奏，但是不给音高。根据节奏型尝试为每个节奏点赋予音高，最终复现这一句的旋律。
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fantasy_guide_div_1">
+                        <h1>ABOUT</h1>
+                        <a class="closed_yin_yang"><hr></a>
+                        <div class="main_content_container">
+                            <div class="main_content_content">
+                                <div class="inside_side_bar_container">
+                                    <ul class="about_link">
+                                        <li><a href="/about/#what_is_touhou"><span>东方Project</span></a></li>
+                                        <li><a href="/about/#what_is_touhou_fantasy_guide"><span>东方幻想指南</span></a></li>
+                                        <li><a href="/about/#what_is_pdot_studio"><span>P大点工作室</span></a></li>
+                                    </ul>
+                                    <div class="powered_by">
+                                        Powered by <img src="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/PStudio.png" alt = "Logo of the Studio (need to be confirm)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="close_menu" href="###"></a>
+                    <div id="main_side_bar_mask"></div>
+                </div>
+                <div class="left_padding_div">
+                    <div id="main_content_container" class="top_padding_div">
+                    </div>
+                </div>
+            </div>
+            <div id="footer_wrap">
+            </div>
+            <div class="main_background"></div>
+            <div class="particle-container"></div>
+        </div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/cookie.js"></script>
+    <script>
+        /* 恶趣味 */
+
+        // 获取包含问号的文本内容
+        var AQ = document.getElementById('AQ');
+        var AQ_text = AQ.textContent;
+
+        // 定义更新文本的函数
+        function updateText() {
+        // 生成一个随机数，例如在1到100之间
+        var randomNum = Math.floor(Math.random() * 999) + 1;
+
+        // 将文本内容中的问号替换为随机数
+        var newText = AQ_text.replace('?', randomNum);
+
+        // 更新 h3 元素的文本内容
+        AQ.textContent = newText;
+        }
+
+        // 每隔一定时间调用更新函数，例如每5秒
+        setInterval(updateText, 50); // 时间单位为毫秒，这里是5秒
+    </script>
+    <script>
+        // 选择符合条件的所有元素
+        var elements = document.querySelectorAll("#main_side_bar > .fantasy_guide_div_1 > a");
+
+        let lastClickTime = 0;
+        const clickDelay = 2000; // 2秒
+
+        // 遍历匹配的元素
+        elements.forEach(function(element) {
+            element.onclick = function() {
+                yin_yang_open_and_close(element)
+            }
+        });
+
+        function yin_yang_open_and_close(self) {
+            
+            const currentTime = Date.now();
+
+            var main_side_bar = document.getElementById("main_side_bar");
+            var main_content = document.getElementById("main_content")
+            var main_content_padding_left = document.querySelector(".left_padding_div");
+
+            main_content.classList.add("on_load")
+
+            if (self.classList.contains('closed_yin_yang')) {
+                if (currentTime - lastClickTime < clickDelay) {
+                    return
+                }
+                lastClickTime = currentTime; // 更新最后一次点击时间
+                self.classList.remove('closed_yin_yang')
+
+                main_side_bar.classList.add("side_bar_is_open")
+
+                if (main_content) {
+                    main_content.classList.add("main_content_shrink");
+                }
+                if (main_content_padding_left) {
+                    main_content_padding_left.classList.add("main_content_padding_left_shrink");
+                }
+
+                var other_chunks = document.querySelectorAll("#main_side_bar > .fantasy_guide_div_1");
+                other_chunks.forEach(function (element) {
+                    if (element !== self.parentElement) {
+                        element.classList.add('disappear')
+                    }
+                    else {
+                        element.classList.add('to_left_top')
+                        element.classList.remove('back_from_left_top')
+                    }
+                });
+            } else {
+                self.classList.add('closed_yin_yang')
+                main_side_bar.classList.remove("side_bar_is_open")
+
+                if (main_content) {
+                    main_content.classList.remove("main_content_shrink")
+                }
+                if (main_content_padding_left) {
+                    main_content_padding_left.classList.remove("main_content_padding_left_shrink");
+                }
+
+                var other_chunks = document.querySelectorAll("#main_side_bar > .fantasy_guide_div_1");
+                other_chunks.forEach(function (element) {
+                    if (element !== self.parentElement) {
+                        element.classList.remove('disappear')
+                    }
+                    else {
+                        element.classList.remove('to_left_top')
+                        element.classList.add('back_from_left_top')
+                        setTimeout(function () {
+                            // 从元素中删除特定的类
+                            element.classList.remove('back_from_left_top');
+                        }, clickDelay); // clickDelay
+                    }
+                });
+
+                lastClickTime = currentTime; // 更新最后一次点击时间
+            }
+        }
+
+        var close_menu = document.querySelectorAll(".close_menu")
+
+        close_menu.forEach(function(each_close_menu) {
+            each_close_menu.onclick = function() {
+                var element = document.querySelector("#main_side_bar > .to_left_top > a")
+                if (element !== null){
+                    element.click()
+                }
+            }
+        })
+    </script>
+    <script>
+        var registerLink = document.getElementById('header_to_register');
+        if (registerLink) {
+            registerLink.href = '/login/?goto=register&redirect_url=' + encodeURIComponent(window.location.href);
+        }
+        
+        var loginLink = document.getElementById('header_to_login');
+        if (loginLink) {
+            loginLink.href = '/login/?goto=login&redirect_url=' + encodeURIComponent(window.location.href);
+        }
+    </script>
+    <script>
+        if (Math.random() <= 0.01) {
+            var header = document.getElementById('header');
+            header.style.backgroundImage = "url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/touhouFantasyGuideLOGO_glitch.svg)";
+
+            $("<link>").attr({
+                rel:  "stylesheet",
+                type: "text/css",
+                href: "https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/etalpmet.css"
+            }).appendTo("head");
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/template.js"></script>
+    <script>
+        // 暂      
+        async function think() {
+            while (true) {await new Promise(
+                    resolve => setTimeout(resolve, 1000));}
+        }
+        async function ask() {await new Promise(() => {})}
+        async function pku() {
+            const answer = ask(); await think(); await answer;
+        }
+        pku()
+    </script>
+    <script>
+        function isPhone() {
+            return /Mobile|Android/i.test(navigator.userAgent)
+        }
+
+        function getRandomRotation() {
+            return Math.floor(Math.random() * 41) - 20; // 随机旋转角度在±15度之间
+        }
+
+        function getRandomPosition() {
+            return 100 * Math.random(); // 随机位置
+        }
+
+        function getRandomDelay() {
+            return Math.random() * 6
+        }
+
+        function setDivinityMain() {
+            var container = document.getElementById("container")
+
+            if(container) {
+                N = isPhone() ? 50 : 300;
+                container.style.opacity = 1;
+                for (let i = 0; i < N; i++) {
+                    const divinity = document.createElement('div');
+                    divinity.className = 'divinity';
+                    divinity.style.transform = `rotate(${getRandomRotation()}deg)`;
+                    divinity.style.left = `calc(${getRandomPosition()}% - 8%)`;
+                    divinity.style.top = `calc(${getRandomPosition()}% - 6%)`;
+                    divinity.style.animationDelay = `${getRandomDelay() + 0.6}s`;
+                    divinity.style.zIndex = -1;
+                    container.appendChild(divinity);
+                }
+            }
+            else {
+                setTimeout(setDivinityMain, 10)
+            }
+        }
+    </script>
+    <script>
+        function changeMode(e) {
+            document.body.classList.toggle("dark")
+            if (document.body.classList.contains("dark")) {
+                e.title = "切换至桑尼"
+                setCookie("dark_theme", "dark")
+            } else {
+                e.title = "切换至露娜"
+                setCookie("dark_theme", "light")
+            }
+        }
+    </script>
+    <script>
+        var omikujiAll = null;
+
+        function getFormattedDate() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0'); // 月份从 0 开始
+            const dd = String(now.getDate()).padStart(2, '0');
+            return `${yyyy}${mm}${dd}`;
+          }
+
+        $.ajax({
+            url: "/template/omikuji.json",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                omikujiAll = data
+                var today = getFormattedDate();
+                if (today !== docCookies.getItem("omikuji_date")) {
+                    var omikuji_id = Math.floor(Math.random() * 128);
+                    docCookies.setItem("omikuji_id", omikuji_id);
+                    docCookies.setItem("omikuji_date", today);
+                    console.log(today)
+                }
+                loadOmikuji(parseInt(docCookies.getItem("omikuji_id")) + 1);
+            },
+            error: function (xhr, status, error) {
+                console.error("请求失败:", error);
+            }
+        });
+
+        function loadOmikuji(idx) {
+            if (omikujiAll === null) return;
+
+            var omikuji = omikujiAll[idx];
+            
+            const omikujiNum = document.getElementById("omikuji_num");
+            const omikujiBangou = document.getElementById("omikuji_bangou");
+            const omikujiTitle = document.getElementById("omikuji_title");
+            const omikujiName = document.getElementById("omikuji_name");
+            const omikujiAbility = document.getElementById("omikuji_ability");
+            const omikujiPoem = document.getElementById("omikuji_poem");
+            const omikujiFortune = document.getElementById("omikuji_fortune");
+            const omikujiFortuneText1 = document.getElementById("omikuji_fortune_text_1");
+            const omikujiFortuneText2 = document.getElementById("omikuji_fortune_text_2");
+
+            omikujiNum.innerHTML = idx + 1;
+            omikujiBangou.innerHTML = "<span class='omikuji_temp'>第</span>" + (idx + 1) + "<span class='omikuji_temp'>番</span>";
+
+            // handle 【大々凶】
+
+            var fortune = omikuji[0][1];
+            omikujiFortune.removeAttribute("style")
+            omikujiFortune.innerHTML = "";
+            if (typeof fortune === "object") {
+                omikujiFortune.innerHTML = `<span style="text-decoration: line-through double;">${fortune[0]}</span>${fortune[1]}`;
+                if ((fortune[0] + fortune[1]).length === 5) {
+                    omikujiFortune.style.letterSpacing = "-0.15em";
+                    omikujiFortune.style.fontSize = 4. / 5 * 2.6 + "vh";
+                }
+            } else if (fortune.includes("【")) {
+                var fortuneInner = document.createElement("div");
+                if (fortune.length == 4) fortuneInner.style.letterSpacing = "-0.05em";
+                fortuneInner.classList.add("omikuji_fortune_inner");
+                fortuneInner.innerHTML = fortune;
+                omikujiFortune.appendChild(fortuneInner);
+            } else if (fortune.length == 4) {
+                var scale = 1.3;
+                omikujiFortune.style.letterSpacing = "-0.05em";
+                omikujiFortune.style.fontSize = 2.7 / scale + "vh";
+                omikujiFortune.style.transform = "scale(1," + scale + ")";
+                omikujiFortune.innerHTML = fortune;
+            } else if (fortune.length >= 5) {
+                omikujiFortune.style.letterSpacing = "-0.15em";
+                omikujiFortune.style.fontSize = 4. / fortune.length * 2.6 + "vh";
+                omikujiFortune.innerHTML = fortune;
+            } else {
+                omikujiFortune.innerHTML = fortune;
+            }
+
+            omikujiTitle.innerHTML = omikuji[1][0];
+
+            var name = omikuji[1][1];
+            omikujiName.removeAttribute("style")
+            if (typeof name === "object") {
+                // 去掉name[1]的左右括号
+                name[1] = name[1].replace(/^（|）$/g, '');
+                omikujiName.innerHTML = `${name[0]}<span style="margin: 0 -0.5em; display: flex">（<span style="font-size: 1.15vh;">${name[1]}</span>）</span>`;
+                if ((name[0]+name[1]).length >= 7) {
+                    omikujiName.style.letterSpacing = "-0.2vh";
+                }
+            } else if (name.length <= 7) {
+                omikujiName.innerHTML = name;
+            } else if (name.length == 8) {
+                omikujiName.style.letterSpacing = "-0.2vh";
+                omikujiName.innerHTML = name;
+            } else {
+                omikujiName.style.letterSpacing = "-0.3vh";
+                omikujiName.style.fontSize = 9. / name.length * 2.3 + "vh";
+                omikujiName.style.transform = "scale(1," + name.length / 9. + ")";
+                omikujiName.innerHTML = name;
+            }
+            
+            var ability = omikuji[1][2];
+            if (typeof ability === "object") {
+                omikujiAbility.innerHTML = `${ability[0]}<span style="font-size: 0.7vh;">${ability[1]}</span>`;
+            } else {
+                omikujiAbility.innerHTML = ability;
+            }
+
+            omikujiPoem.innerHTML = ""
+            omikujiFortuneText1.innerHTML = ""
+            omikujiFortuneText2.innerHTML = ""
+
+            if (omikuji.length === 2) return;
+
+            // join,把'\n'换成'<br>'
+            omikujiPoem.innerHTML = omikuji[2].filter((s) => {return s!=='\n'}).join('<br>')
+            
+
+            if (omikuji.length === 3) return;
+            loadFortuneText(omikujiFortuneText1, omikuji[3]);
+
+            if (omikuji.length === 4) return;
+            loadFortuneText(omikujiFortuneText2, omikuji[4]);
+        }
+
+        function loadFortuneText(e, data) {
+            e.innerHTML = "";
+            for (var i = 0; i < data.length; i++) {
+                var fortuneText = document.createElement("div");
+                fortuneText.classList.add("omikuji_inner_text");
+                console.log(i, data[i])
+                if (typeof data[i] === "string") {
+                    fortuneText.innerHTML = data[i];
+                } else if (typeof data[i] === "object") {
+                    fortuneText.innerHTML = data[i].filter((s) => {return s!=='\n'}).join('<br>')
+                }
+
+                e.appendChild(fortuneText);
+            }
+        }
+
+        function showOmikuji() {
+            var omikuji = document.getElementById("omikuji");
+            var omikujiShow = document.getElementById("omikuji_show");
+            var omikujiHide = document.getElementById("omikuji_hide");
+
+            omikuji.classList.add("show");
+            omikujiShow.style.display = "none";
+            omikujiHide.style.display = "block";
+        }
+
+        function hideOmikuji() {
+            var omikuji = document.getElementById("omikuji");
+            var omikujiShow = document.getElementById("omikuji_show");
+            var omikujiHide = document.getElementById("omikuji_hide");
+
+            omikuji.classList.remove("show");
+            omikujiShow.style.display = "block";
+            omikujiHide.style.display = "none";
+        }
+
+    </script>
+    <script>
+        const container = document.querySelector('.particle-container');
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+
+            const type = Math.floor(Math.random() * 3); // 0 - 2
+            particle.classList.add(`particle_rise_${type}`);
+
+            const size = Math.random() * 8 + 2; // 2px - 10px
+            const left = Math.random() * 100; // 0% - 100%
+            const bottom = Math.random() * -40 - 10; // -50% - -10%
+            const duration = Math.random() * 6 + 10; // 10s - 16s
+            const delay = Math.random() * 16; // 0s - 3s
+
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${left}vw`;
+            particle.style.bottom = `${bottom}vh`;
+            particle.style.animationDuration = `${duration}s`;
+            particle.style.animationDelay = `${delay}s`;
+
+            container.appendChild(particle);
+
+            // 动画结束后删除粒子
+            setTimeout(() => {
+                particle.remove();
+                createParticle(); // 创建新的粒子
+            }, (duration + delay) * 1000);
+        }
+
+        // 生成多个粒子
+        for (let i = 0; i < 100; i++) {
+            createParticle();
+        }
+    </script>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <title>Danmaku Server Test</title>
+    </head>
+    <body></body>
+    <script>
+        const ws = new WebSocket("ws://localhost:8080");
+
+        ws.onopen = () => {
+            console.log("Connected to WebSocket server");
+            // Send a test message to the server
+            ws.send(JSON.stringify({ type: "test", content: "Hello, Server!" }));
+        };
+
+        ws.onmessage = (event) => {
+            console.log("Message from server:", event.data);
+        };
+
+        ws.onclose = () => {
+            console.log("Disconnected from WebSocket server");
+        };
+
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+    </script>
+</html>

@@ -1,0 +1,78 @@
+@media (min-width: 769px) {
+    #main_content {
+        transform: translate(calc(-6rem - 2.5% - 30px), 0);
+    }
+
+    #main_content.on_load {
+        transition: transform 0.5s 0.5s, padding-left var(--side_bar_spread_time) ease, width var(--side_bar_spread_time) ease;
+    }
+
+    .side_bar_is_open#main_side_bar ~ * #main_content,
+    #main_side_bar:hover ~ * #main_content {
+        transform: translate(0, 0);
+        transition: transform 0.5s 0.1s, padding-left var(--side_bar_spread_time) ease, width var(--side_bar_spread_time) ease;
+    }
+
+    #main_side_bar {
+        left: calc(-12rem - 5vw - 38px);
+        transition: left 0.5s 0.5s;
+        padding-right: 25px;
+    }
+    
+    /* .side_bar_is_open#main_side_bar {
+        left: calc(-50vw + 100rem / 16 - 38px); 
+    } */
+    
+    #main_side_bar::after {
+        display: block;
+        position: absolute;
+        width: 30px;
+        aspect-ratio: 1/2;
+        top: calc(2 * 7.6875rem + 4 * 0.8125rem - 30px + 48px);
+        right: 0;
+        opacity: 1;
+        background: var(--uni-text-color);
+        content: "";
+        -webkit-mask-image: var(--image-mask);
+        -webkit-mask-position: center;
+        -webkit-mask-size: 30px;
+        -webkit-mask-repeat: no-repeat;
+        -moz-mask-image: var(--image-mask);
+        -moz-mask-position: center;
+        -moz-mask-size: 30px;
+        -moz-mask-repeat: no-repeat;
+        -o-mask-image: var(--image-mask);
+        -o-mask-position: center;
+        -o-mask-size: 30px;
+        -o-mask-repeat: no-repeat;
+        mask-image: var(--image-mask);
+        mask-position: center;
+        mask-size: 30px;
+        mask-repeat: no-repeat;
+        filter: blur(0px);
+        --image-mask: url(
+        "https://fantasyguide.cn/images/right_arrow.svg");
+        z-index: -1;
+        transition: opacity 0.3s calc(var(--side_bar_spread_time) - 0.3s), right var(--side_bar_spread_time) 0.5s;
+    }
+    
+    .side_bar_is_open#main_side_bar {
+        left: 0;
+    }
+    
+    .side_bar_is_open#main_side_bar::after,
+    .side_bar_is_open#main_side_bar:hover::after {
+        opacity: 0;
+        transition: opacity 0.1s;
+    }
+    
+    #main_side_bar:hover {
+        left: 0px;
+        transition: left 0.5s 0.1s, top 0.5s ease;
+    }
+
+    #main_side_bar:hover::after {
+        right: 10px;
+        transition: opacity 0.3s calc(var(--side_bar_spread_time) - 0.3s), right 0.5s 0.2s;
+    }
+}

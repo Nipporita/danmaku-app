@@ -1,0 +1,1684 @@
+/* import 区 */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400;500;600;700;900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Kaisei+Tokumin:wght@400;500;700;800&display=swap');
+
+/* 字体区 */
+@font-face {
+    font-family: "YanSong";
+    src: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/ZaoZiGongFangYanSongTi-1.otf") format("opentype");
+}
+
+@font-face {
+    font-family: 'AaGothic';
+    src: url('https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/AaGothic.woff2') format('woff2'),
+        url('https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/AaGothic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JinWenCN";
+    src: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/金文體W3-GB5.TTC") format("truetype");
+}
+
+@font-face {
+    font-family: "Lyra";
+    src: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/FOT-LYRA_STD_DB.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: "DYS";
+    src: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/FZDYSJW.TTF") format("truetype");
+}
+
+@font-face {
+    font-family: "ZZOldMincho";
+    src: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/FZFWZhuZiAOldMinchoR.TTF") format("truetype");
+}
+
+@font-face {
+    font-family: "JinLing";
+    src: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/FZJinL-L_GBJF.TTF") format("truetype");
+}
+
+@font-face {
+    font-family: "FZSHJW";
+    src: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/FZSHJW.TTF") format("truetype");
+}
+
+@font-face {
+    font-family: "YuMincho";
+    src: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/fonts/YuMincho_+36p_Kana_Extrabold.otf") format("opentype");
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap');
+
+/*
+==============================
+仓耳与墨W03
+==============================
+Copy from http://etinjat.wikidot.com/typeface-cn
+==============================
+*/
+
+@font-face { font-family: '仓耳与墨W03'; 
+    font-style: normal; font-weight: 400;font-display: swap;
+    src: url('https://fastly.jsdelivr.net/gh/Etinjat/FONT@Tsanger/仓耳与墨W03.woff2') format('woff2');
+}
+
+/*
+==============================
+霞骛文楷
+==============================
+Copy from http://etinjat.wikidot.com/typeface-cn
+==============================
+*/
+
+@font-face { font-family:'LXGW WenKai'; 
+    font-style: normal; font-display: swap;
+    src: url('https://fastly.jsdelivr.net/gh/Etinjat/Fonts@main/FONT_LXGWWenKaiMono-Regular.woff2') format('woff2');
+}
+
+/* 动画区 */
+@keyframes swing {
+    0% {
+        transform: rotate(-15deg);
+    }
+    50% {
+        transform: rotate(15deg);
+    }
+    100% {
+        transform: rotate(-15deg);
+    }
+}
+
+@keyframes disappear_and_back {
+    0% {
+        opacity: 1;
+    }
+    10% {
+        opacity: 0;
+    }
+    70% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* root定义 */
+:root {
+    --buttonface: white;
+    --posX: calc(50% - 170px - 12rem);
+    --fnTransition: 0.3s;
+    --fnLinger: 0.15s;
+    --fnInteract: calc(var(
+    --fnTransition) + var(--fnLinger));
+
+    --container_background_size: calc(80em / 16);
+
+    --side_bar_spread_time: 2s;
+    --side_bar_opacity_time: 0.6s;
+    --side_bar_spread_delay: 0.1s;
+    --side_bar_mask_opacity_time: 0.5s;
+}
+
+/* html定义 */
+html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* body定义 */
+body {
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--uni-background-color);
+    --fantasy-guide-logo: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/touhouFantasyGuideLOGO.svg");
+    --bottom-offset: 40px;
+}
+
+button {
+    margin: 5px;
+    border: none;
+    min-height: calc(1rem + 10px);
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+#content_wrap {
+    position: relative;
+}
+
+#main_content {
+    width: calc(100vw - 12rem - 5vw - 100px);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    align-content: flex-start;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#main_content.on_load {
+    transition: width var(--side_bar_spread_time) ease;
+    min-height: calc(100vh - 140rem / 16 - 60px - 0.667px - var(--bottom-offset));
+    overflow: hidden;
+}
+
+@media (min-width: 769px) {
+    .main_content_shrink#main_content {
+        width: calc(50vw);
+        /* padding-left: calc(50vw - 40px); */
+    }
+}
+
+
+/* header 定义 */
+#header {
+    height: calc(140rem / 16);
+    width: 100%;
+    position: fixed;
+    background-image: var(--fantasy-guide-logo);
+    background-size: calc(100rem / 16);
+    background-position-x: calc(6rem + 2.5vw - 50rem / 16 + 22px);
+    background-position-y: center;
+    background-repeat: no-repeat;
+    padding-left: calc(6rem + 2.5vw + 50rem / 16 + 22px + 10px);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--uni-text-color);
+    background-color: var(--uni-background-color);
+    z-index: 20;
+    /* overflow: hidden; */
+    box-sizing: border-box;
+}
+
+#header h1, 
+#header h2, 
+#header h3, 
+#header h4, 
+#header h5, 
+#header h6 {
+    display: flex;
+    margin-block: 0;
+    text-shadow: 0 0 4px rgb(255,255,255);
+    filter: drop-shadow(0px 0px 3px white);
+    font-family: "Kaisei Tokumin", Arial, Helvetica, sans-serif;
+    color: black;
+}
+
+.header_content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.omikuji_wrap {
+    display: block;
+    position: fixed;
+    display: flex;
+    top: calc(-68vh + 140rem / 16 + 30px);
+    /* aspect-ratio: 1 / 3.1415926; */
+    width: calc(70vh / 3.1415926);
+    height: 70vh;
+    background: white;
+    right: 20%;
+    z-index: 1000;
+    box-shadow: 0px 0px 4px 2px rgba(0,0,0,1);
+    flex-direction: column;
+    font-size: 0.9vh;
+    /* background: linear-gradient(0deg, red, white, red, white, red, white, red); */
+    transition: top 0.5s ease-in-out;
+    z-index: 2;
+}
+
+/* 登录框定义 */
+
+.login_wrap {
+    height: 70%;
+    aspect-ratio: 1;
+    background-image: url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/background_image_1.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-right: calc(2px + 140rem / 16 + 0.667px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login_wrap::after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 2px;
+    background-image: url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/touhou_cover.svg);
+    background-position-x: right;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    aspect-ratio: 260/150;
+    height: 70%;
+    
+    --image-mask: linear-gradient(270deg, transparent 0%, rgba(0, 0, 0, 0.4) 60%, black);
+    mask-image: var(--image-mask);
+    mask-position: right center;
+    -o-mask-image: var(--image-mask);
+    -o-mask-position: right center;
+    -moz-mask-image: var(--image-mask);
+    -moz-mask-position: right center;
+    -webkit-mask-image: var(--image-mask);
+    -webkit-mask-position: right center;
+    z-index: -10;
+}
+
+.login_wrap hr {
+    margin: 0;
+}
+
+.login_link {
+    text-decoration: none;
+    font-family: "YanSong", Arial, Helvetica, sans-serif;
+    font-size: 1.3rem;
+    color: var(--uni-text-color);
+    cursor: pointer;
+}
+
+.login_link:visited {
+    color: var(--uni-text-color);
+}
+
+#has_login {
+    height: 100%;
+    aspect-ratio: 1;
+    position: relative;
+    z-index: 5;
+}
+
+#has_login::before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 74%;
+    top: var(--top-left);
+    left: var(--top-left);
+    aspect-ratio: 1;
+    background-image: url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/background_image_2.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    z-index: 1;
+    --top-left: 13%;
+    pointer-events: none;
+}
+
+.login_content {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    z-index: 0;
+}
+
+.login_content::before {
+    display: block;
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    background-image: url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/background_image_1.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.user_profile {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    --image-mask: url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/background_image_mask.svg);
+    --mask-size: 70%;
+    -webkit-mask-image: var(--image-mask);
+    -webkit-mask-position: center;
+    -webkit-mask-size: var(--mask-size);
+    -webkit-mask-repeat: no-repeat;
+    -moz-mask-image: var(--image-mask);
+    -moz-mask-position: center;
+    -moz-mask-size: var(--mask-size);
+    -moz-mask-repeat: no-repeat;
+    -o-mask-image: var(--image-mask);
+    -o-mask-position: center;
+    -o-mask-size: var(--mask-size);
+    -o-mask-repeat: no-repeat;
+    mask-image: var(--image-mask);
+    mask-position: center;
+    mask-size: var(--mask-size);
+    mask-repeat: no-repeat;
+    background: var(--uni-background-color);
+    position: relative;
+    z-index: 0;
+}
+
+.user_profile img {
+    height: 70.7%;
+    width: 70.7%;
+}
+
+.user_profile a {
+    z-index: 2;
+    display: block;
+    position: absolute;
+    height: 70.7%;
+    width: 70.7%; 
+}
+
+.user_menu {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: translate(0, -100%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out 0.2s;
+    color: black;
+}
+
+.user_menu_block {
+    position: absolute;
+    width: 100%;
+    aspect-ratio: 1;
+    top: 0;
+    left: 0;
+    background-image: url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/background_image_1.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: top 0.4s ease-in-out;
+    transition-delay: calc(var(--delay) * (var(--count) - 1));
+    z-index: calc(-1 * var(--count));
+    --delay: 0.05s;
+    --count: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "YanSong", Arial, Helvetica, sans-serif;
+    font-size: 1.3rem;
+}
+
+.user_profile:hover + .user_menu ,
+.user_menu:hover {
+    opacity: 1;
+    transition: opacity 0.4s ease-in-out 0s;
+}
+
+.user_menu .user_menu_block:nth-child(1) {
+    --count: 1;
+}
+.user_menu .user_menu_block:nth-child(2) {
+    --count: 2.5;
+}
+.user_menu .user_menu_block:nth-child(3) {
+    --count: 4;
+}
+.user_menu .user_menu_block:nth-child(4) {
+    --count: 5.5;
+}
+
+.user_profile:hover + .user_menu .user_menu_block,
+.user_menu:hover .user_menu_block {
+    top: calc(140rem/16/2 * var(--count));
+}
+.user_profile:hover + .user_menu .user_menu_block:nth-child(1),
+.user_menu:hover .user_menu_block:nth-child(1) {
+    --count: 1;
+}
+.user_profile:hover + .user_menu .user_menu_block:nth-child(2),
+.user_menu:hover .user_menu_block:nth-child(2) {
+    --count: 2;
+}
+.user_profile:hover + .user_menu .user_menu_block:nth-child(3),
+.user_menu:hover .user_menu_block:nth-child(3) {
+    --count: 3;
+}
+.user_profile:hover + .user_menu .user_menu_block:nth-child(4),
+.user_menu:hover .user_menu_block:nth-child(4) {
+    --count: 4;
+}
+
+#username_block {
+    width: 60%;
+    font-size: 70%;
+    text-align: center;
+    font-family: "YanSong", Arial, Helvetica, sans-serif;
+}
+
+.user_menu_block a,
+.user_menu_block a:visited,
+.user_menu_block a:active{
+    text-decoration: none;
+    color: var(--uni-text-color);
+    color: black;
+    font-family: "YanSong", Arial, Helvetica, sans-serif;
+}
+
+/* 头框定义 */
+#nav_bar {
+    width: 100%;
+    background-color: var(--uni-anti-background-color);
+    color: var(--uni-anti-text-color);
+    margin-bottom: 17px;
+    z-index: -1;
+    position: absolute;
+    left: 0;
+    box-shadow: 0px 0px 4px 2px var(--nav-bar-shadow-color);
+    top: calc(140rem / 16);
+    border: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: solid var(--uni-anti-background-color) 3px;
+}
+
+#nav_bar ul {
+    margin-block: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    font-family: 'LXGW WenKai', Arial, Helvetica, sans-serif;
+    align-items: center;
+    align-content: center;
+}
+
+#nav_bar li {
+    margin: 0px 10px;
+}
+
+#nav_bar a,
+#nav_bar a:visited {
+    color: var(--uni-anti-text-color);
+    text-decoration: none;
+}
+
+#nav_bar > a {
+    position: absolute;
+    width: 50px;
+    text-align: center;
+    transform: translate(0px, 0px);
+}
+
+body.dark #nav_bar > a {
+    /* transform: translate(0px, -4px); */
+}
+
+#nav_bar > a::before {
+    content: "🌚︎";
+    font-size: 0.9em;
+}
+
+body.dark #nav_bar > a::before {
+    content: "🌞︎";
+    font-size: 1.3em;
+}
+
+/* 侧边栏定义 */
+#side_bar {
+    position: relative;
+    left: 30px;
+    width: 14rem;
+    margin-right: 30px; 
+}
+
+.side_bar_block {
+    padding: 10px;
+    border: 1px solid var(--uni-border-color);
+    border-radius: 10px;
+    background: #fff;
+    margin-bottom: 15px;
+}
+
+#container {
+    /* min-height: 100vh; */
+    width: 100%;
+    /* padding-bottom: calc(7rem + 1rem); */
+    position: relative;
+}
+
+.main_background {
+    position: absolute;
+    min-height: 100vh;
+    opacity: 0.5;
+    width: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    /* background-color: var(--uni-background-color); */
+    background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/imperial_coin_pattern.svg");
+    background-repeat: repeat;
+    background-size: var(--container_background_size);
+    z-index: -100;
+    --image-mask: linear-gradient(to bottom, black , transparent );
+    mask-image: var(--image-mask);
+    -webkit-mask-image: var(--image-mask);
+    -moz-mask-image: var(--image-mask);
+    -o-mask-image: var(--image-mask);
+}
+
+#main_side_bar {
+    position: fixed;
+    top: calc(140rem / 16 + 21px + 0.667px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-content: flex-start;
+    width: auto;
+    height: calc(100vh - 140rem / 16 - 21px - 0.667px);
+    pointer-events: none;
+    z-index: 10;
+    padding-left: 20px;
+    padding-top: 20px;
+    padding-right: 18px;
+    overflow-y: overlay;
+    overflow-x: visible;
+    scrollbar-width: none;
+    pointer-events: all;
+}
+
+#main_side_bar::-webkit-scrollbar {
+    display: none;
+}
+
+#main_side_bar > .fantasy_guide_div_1 {
+    width: calc(12rem + 5vw);
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    height: calc(7.6875rem + 2 * 0.8125rem);
+    /* padding-top: 0.8125rem; */
+    /* padding-bottom: 0.8125rem; */
+    transition: width var(--side_bar_spread_time) ease,
+     opacity var(--side_bar_opacity_time) ease calc(var(--side_bar_spread_time) - var(--side_bar_opacity_time)),
+      height var(--side_bar_spread_time) ease,
+       padding var(--side_bar_spread_time) ease,
+        margin var(--side_bar_spread_time) ease;
+    pointer-events: all;
+    box-sizing: border-box;
+    transform: scale(1);
+}
+
+#main_side_bar > .fantasy_guide_div_1::before {
+    position: absolute;
+    width: 5rem;
+    height: 5rem;
+    font-family: "AaGothic", Arial, Helvetica, sans-serif;
+    font-size: 2.25rem;
+    left: -16px;
+    top: -14px;
+    background-image: var(--main-side-bar-before-background-image);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(1):before {
+    content: "☵";
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(2):before {
+    content: "☷";
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(3):before {
+    content: "☳";
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(4):before {
+    content: "☴";
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(5):before {
+    content: "▣";
+    font-weight: bold;
+    font-size: 4.1rem;
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(6):before {
+    content: "☰";
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(7):before {
+    content: "☱";
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(8):before {
+    content: "☶";
+}
+#main_side_bar > .fantasy_guide_div_1:nth-child(9):before {
+    content: "☲";
+}
+
+#main_side_bar > .fantasy_guide_div_1::after {
+    content: " ";
+    position: absolute;
+    width: calc(110rem / 16);
+    height: calc(110rem / 16);
+    background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/focus.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: calc(110rem / 16);
+    left: calc(50% - 3.375rem);
+    top: calc(56.5rem / 16);
+    opacity: 0;
+    transition: opacity var(--side_bar_opacity_time) ease, visibility var(--side_bar_opacity_time) ease, left var(--side_bar_spread_time) ease, top var(--side_bar_spread_time) ease;
+    animation: swing 10s infinite;
+    pointer-events: none;
+    filter:grayscale(1);
+    z-index: 1;
+}
+
+#main_side_bar > .fantasy_guide_div_1:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+#main_side_bar > .fantasy_guide_div_1 > h1:first-child {
+    font-size: 2.5rem;
+    margin-left: 2.75rem;
+    margin-top: 1.4375rem;
+    margin-bottom: 0.625rem;
+    flex-shrink: 0;
+}
+
+#main_side_bar > .fantasy_guide_div_1 > a > hr {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    transition: width var(--side_bar_spread_time) ease  var(--side_bar_spread_delay);
+    background-color: #e7e7e7;
+}
+
+#main_side_bar > .fantasy_guide_div_1 > a.closed_yin_yang > hr {
+    transition: width var(--side_bar_spread_time) ease 0s;
+}
+
+#main_side_bar > .fantasy_guide_div_1 > a {
+    height: calc(50rem / 16);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: height var(--side_bar_spread_time) ease;
+    cursor: pointer;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.closed_yin_yang hr {
+    width: 0;
+}
+
+#main_side_bar > .fantasy_guide_div_1 a.closed_yin_yang hr::before {
+    left: calc(50% - 17rem / 16);
+    transition: left var(--side_bar_spread_time) ease  var(--side_bar_spread_delay), top var(--side_bar_spread_time) ease  var(--side_bar_spread_delay);
+}
+
+#main_side_bar > .fantasy_guide_div_1 a.closed_yin_yang hr::after {
+    right: calc(50% - 19.6rem / 16);
+    transition: right var(--side_bar_spread_time) ease  var(--side_bar_spread_delay), top var(--side_bar_spread_time) ease  var(--side_bar_spread_delay);
+}
+
+#main_side_bar > .fantasy_guide_div_1 > a > hr::before{
+    transition: left var(--side_bar_spread_time) ease 0s, top var(--side_bar_spread_time) ease 0s;
+    transform: translate(0px);
+    top: calc(92.05rem / 16);
+}
+
+#main_side_bar > .fantasy_guide_div_1 > a > hr::after{
+    transition: right var(--side_bar_spread_time) ease 0s, top var(--side_bar_spread_time) ease 0s;
+    transform: translate(0);
+    top: calc(92.5rem / 16);
+}
+
+#main_side_bar > .disappear {
+    opacity: 0;
+    visibility: hidden;
+    height: 0px;
+    padding-bottom: 0;
+    padding-top: 0;
+    transition: opacity 0.2s ease, visibility 0.2s ease, height var(--side_bar_spread_time) ease, padding var(--side_bar_spread_time) ease, margin var(--side_bar_spread_time) ease, border var(--side_bar_spread_time) ease, transform var(--side_bar_spread_time) ease 3s;
+    margin: 0;
+    transform: scale(0);
+}
+
+#main_side_bar > .disappear > a {
+    height: 0px;
+}
+
+#main_side_bar > .to_left_top {
+    height: calc(100vh - 140rem / 16 - 21px - 0.667px - 110px);
+    width: calc(50vw - 100rem / 16);
+    flex-shrink: 0;
+}
+
+#main_side_bar > .to_left_top::after{
+    left: calc(-16px - 0.9375rem);
+    top: calc(-14px - 0.9375rem);
+    opacity: 1;
+    animation: swing 10s infinite, disappear_and_back calc(var(--side_bar_spread_time) * 4 / 3) 1;
+}
+
+#main_side_bar > .back_from_left_top {
+    flex-shrink: 0;
+}
+
+#main_side_bar > .back_from_left_top::after,
+#main_side_bar > .back_from_left_top:hover::after{
+    left: calc(50% - 3.375rem);
+    top: calc(56.5rem / 16);
+    opacity: 0;
+    animation: swing 10s infinite;
+}
+
+#main_side_bar > *:nth-last-child(3) {
+    margin-bottom: 250px;
+}
+
+#main_side_bar.side_bar_is_open > .fantasy_guide_div_1:nth-last-child(3) {
+    margin-bottom: 0px;
+}
+
+.music_message_container {
+    display: flex;
+    flex-direction: column;
+    font-family: 'LXGW WenKai', Arial, Helvetica, sans-serif;
+}
+
+.main_content_container {
+    position: relative;
+    width: auto;
+    height: auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    overflow: hidden;
+    transform: translate(0px, calc(-25rem / 16));
+}
+
+.main_content_content {
+    width: calc(100% - 45rem / 16 - 14px);
+    text-align: left;
+    position: relative;
+    /*aspect-ratio: 3;*/
+    aspect-ratio: 1;
+    overflow-y: auto;
+    opacity: 1;
+    transition: opacity var(--side_bar_spread_time) ease, aspect-ratio var(--side_bar_spread_time) ease, width var(--side_bar_spread_time) ease  var(--side_bar_spread_delay);
+    background-color: #e7e7e7;
+    padding-top: calc(25rem / 16);
+    color: black;
+}
+
+#main_side_bar > div > a.closed_yin_yang + .main_content_container > .main_content_content {
+    opacity: 0;
+    aspect-ratio: 1/0.027438934775579793;
+    /*height: 0%;*/
+    width: 0;
+    transition: opacity var(--side_bar_spread_time) ease, aspect-ratio var(--side_bar_spread_time) ease, width var(--side_bar_spread_time) ease;
+}
+
+.inside_side_bar_container {
+    margin: 0px 20px;
+    opacity: 0;
+    transition: opacity calc(var(--side_bar_spread_time) / 3) ease;
+}
+
+.to_left_top .inside_side_bar_container {
+    opacity: 1;
+    transition: opacity calc(var(--side_bar_spread_time) / 2) ease calc(var(--side_bar_spread_time) / 2);
+}
+
+#main_side_bar_mask {
+    display: block;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    -webkit-transition: opacity  var(--side_bar_mask_opacity_time) cubic-bezier(0.5, 1, 0.89, 1);
+    transition: opacity  var(--side_bar_mask_opacity_time) cubic-bezier(0.5, 1, 0.89, 1);
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    content: "";
+    z-index: -1;
+}
+
+#main_side_bar_mask::before {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-transition: background-position 0s linear .4s;
+    transition: background-position 0s linear .4s;
+    background: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/imperial_coin_pattern.svg") repeat 0 0;
+    background-position: calc(var(--container_background_size) * -8) 0px;
+    background-size: var(--container_background_size);
+    width: 100%;
+    height: 100%;
+    content: "";
+}
+
+.side_bar_is_open #main_side_bar_mask {
+    opacity: 1;
+    -webkit-transition: opacity  var(--side_bar_mask_opacity_time) cubic-bezier(0.5, 1, 0.89, 1);
+    transition: opacity  var(--side_bar_mask_opacity_time) cubic-bezier(0.5, 1, 0.89, 1);
+}
+
+.side_bar_is_open #main_side_bar_mask::before {
+    -webkit-transition: background-position 2s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: background-position 2s cubic-bezier(0.25, 1, 0.5, 1);
+    background-position: 0 0;
+}
+
+.about_link li{
+    font-size: 1.5rem;
+    background-color: #e7e7e7;
+    height: 4rem;
+    padding: 0px 1.25rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.5s ease;
+    position: relative;
+}
+
+.about_link li::marker {
+    content: none;
+}
+
+.about_link a {
+    text-decoration: none;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+}
+
+ul.about_link {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+}
+
+.about_link li:hover {
+    background-color: white;
+}
+
+.about_link li::after {
+    display: block;
+    position: absolute;
+    width: 1.5rem;
+    aspect-ratio: 1/2;
+    top: 0.5rem;
+    right: 10px;
+    background: black;
+    content: "";
+    --image-mask: url(
+    https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/right_arrow.svg);
+    -webkit-mask-image: var(--image-mask);
+    -webkit-mask-position: center;
+    -webkit-mask-size: 1.5rem;
+    -webkit-mask-repeat: no-repeat;
+    -moz-mask-image: var(--image-mask);
+    -moz-mask-position: center;
+    -moz-mask-size: 1.5rem;
+    -moz-mask-repeat: no-repeat;
+    -o-mask-image: var(--image-mask);
+    -o-mask-position: center;
+    -o-mask-size: 1.5rem;
+    -o-mask-repeat: no-repeat;
+    mask-image: var(--image-mask);
+    mask-position: center;
+    mask-size: 1.5rem;
+    mask-repeat: no-repeat;
+}
+
+.powered_by {
+    display:flex;
+    align-items:center;
+    font-family: "Kaisei Tokumin", Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    justify-content: center;
+}
+
+.powered_by img {
+    height: 2rem;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    background-image: var(--footer-background-image);
+    background-size: 100% 100%; /* 背景大小与视口一致 */
+    background-repeat: no-repeat; /* 禁止平铺 */
+    padding-top: 3rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
+footer a {
+    text-decoration: none;
+    color: var(--uni-text-color);
+    pointer-events: all;
+}
+
+.fullHeightFantasyGuideDiv {
+    height: calc(100vh - 140rem / 16 - 60px - 0.667px - 0.8125rem * 2 - 14px - var(--bottom-offset));
+}
+
+/* 公安备案 */
+#police::before {
+    content: "";
+    display: inline-block;
+    background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/备案图标.png");
+    background-position: center bottom;
+    background-size: 0.8rem;
+    background-repeat: no-repeat;
+    width: 1rem;
+    height: 1rem;
+}
+
+span.fnnum:hover {
+    background: var(--uni-anti-background-color);
+    color: var(--uni-anti-text-color);
+}
+
+.fncon {
+    position: absolute;
+    right: calc(var(--posX) + 30px);
+    line-height: 1.25;
+    padding: 0.8125rem;
+    width: 12.5rem;
+    box-sizing: border-box;
+    background: var(--uni-background-color);
+    border: .125rem solid var(--uni-border-color);
+    font-size: .9125rem;
+    font-weight: initial;
+    font-style: normal;
+    text-align: initial;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 9;
+    transition: opacity 0.15s linear var(--fnLinger), right var(--fnTransition) cubic-bezier(.08,.72,.5,.94) var(--fnLinger), visibility 0.01s linear var(--fnInteract);
+}
+
+.fnnum:hover + span.fncon {
+    opacity: 1;
+    z-index: 10;
+    right: var(--posX);
+    visibility: visible;
+    transition: opacity 0.15s linear, right var(--fnTransition) cubic-bezier(.08,.72,.5,.94);
+}
+
+/* 预设样式 */
+/* fantasy_guide_div_1 */
+.fantasy_guide_div_1 {
+    font-family: Arial, Helvetica, sans-serif;
+    border-image: var(--fantasy-guide-div-1-border-image);
+    border-image-repeat: stretch;
+    border-image-slice: 36;
+    border-image-width: 14px;
+    border-image-outset: 7px;
+    background: var(--uni-background-color);
+    padding: 0.8125rem 1.4375rem;
+    margin: 7px;
+    box-shadow: 0px 0px 11px 3px rgba(0,0,0,0.8);
+    color: var(--uni-text-color) !important;
+}
+
+div.fantasy_guide_div_1 {
+    position: relative;
+}
+
+.fantasy_guide_div_1 h1,
+.fantasy_guide_div_1 h2,
+.fantasy_guide_div_1 h3,
+.fantasy_guide_div_1 h4,
+.fantasy_guide_div_1 h5,
+.fantasy_guide_div_1 h6,
+.fantasy_guide_div_1 span {
+    font-family: "YanSong", Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    color: var(--uni-text-color);
+}
+
+.main_content_content h1, .main_content_content h2, .main_content_content h3, .main_content_content h4, .main_content_content h5, .main_content_content h6, .main_content_content span {
+    color: black;
+}
+
+.fantasy_guide_div_1 hr {
+    width: calc(100% - 45rem / 16 - 14px) !important;
+    margin: calc(25rem / 16) auto calc(25rem / 16) !important;
+    color: var(--uni-text-color) !important;
+    height: 0.7px !important;
+    background: var(--uni-anti-background-color) !important;
+    border: none !important;
+}
+
+.fantasy_guide_div_1 hr::before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: calc(23rem / 16);
+    height: calc(39rem / 16);
+    width: calc(28rem / 16);
+    margin: 0;
+    background-color: var(--uni-anti-background-color);
+    --image-mask: url(
+    "https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/Yin.svg");
+    -webkit-mask-image: var(--image-mask);
+    -webkit-mask-position: center;
+    -webkit-mask-size: 1.25rem;
+    -webkit-mask-repeat: no-repeat;
+    -moz-mask-image: var(--image-mask);
+    -moz-mask-position: center;
+    -moz-mask-size: 1.25rem;
+    -moz-mask-repeat: no-repeat;
+    -o-mask-image: var(--image-mask);
+    -o-mask-position: center;
+    -o-mask-size: 1.25rem;
+    -o-mask-repeat: no-repeat;
+    mask-image: var(--image-mask);
+    mask-position: center;
+    mask-size: 1.25rem;
+    mask-repeat: no-repeat;
+    transform: translate(0px, -18.9px);
+}
+
+.fantasy_guide_div_1 hr::after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: calc(23rem / 16);
+    height: calc(39rem / 16);
+    width: calc(28rem / 16);
+    margin: 0;
+    background-color: var(--uni-anti-background-color);
+    --image-mask: url(
+    "https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/Yang.svg");
+    -webkit-mask-image: var(--image-mask);
+    -webkit-mask-position: center;
+    -webkit-mask-size: 1.25rem;
+    -webkit-mask-repeat: no-repeat;
+    -moz-mask-image: var(--image-mask);
+    -moz-mask-position: center;
+    -moz-mask-size: 1.25rem;
+    -moz-mask-repeat: no-repeat;
+    -o-mask-image: var(--image-mask);
+    -o-mask-position: center;
+    -o-mask-size: 1.25rem;
+    -o-mask-repeat: no-repeat;
+    mask-image: var(--image-mask);
+    mask-position: center;
+    mask-size: 1.25rem;
+    mask-repeat: no-repeat;
+    transform: translate(0px, -18.9px);
+}
+
+.fantasy_guide_div_1 button {
+    min-width: calc(4rem + 20px);
+    font-family: 'YanSong', Arial, Helvetica, sans-serif;
+    border-image: var(--fantasy-guide-div-1-button-border-image);
+    border-image-repeat: stretch;
+    border-image-slice: 36;
+    border-image-width: 10px;
+}
+
+.fantasy_guide_div_1 a {
+    color: var(--uni-text-color);
+}
+
+.fantasy_guide_div_1 a:visited {
+    color: var(--uni-text-color);
+}
+
+.fantasy_guide_div_1 a:active {
+    color: gray;
+}
+
+.button {
+    cursor: pointer;
+}
+
+/* 显示与隐藏按钮 */
+
+.hide_and_show_button {
+    cursor: pointer;
+    color: var(--uni-text-color);
+    text-decoration: none;
+}
+
+.hide_and_show_button:hover {
+    text-decoration: underline;
+}
+
+.hide_and_show_button:visited {
+    color: var(--uni-text-color);
+}
+
+.hide_and_show_button:active {
+    color: gray;
+}
+
+.hidden_block {
+    display: none;
+}
+
+.sukima > * {
+    display: flex;
+    align-items: center;
+}
+
+.sukima > *::before {
+    content:"";
+    display: block;
+    width: 3em;
+    height: 1em;
+    margin-right: 0.2em;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.sukima_close > *::before {
+    background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");
+}
+
+.sukima_open > *::before {
+    background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");
+}
+
+/* 移动适配 */
+
+.mobile_header {
+    display: none;
+}
+
+/* 小手机 */
+@media (max-width: 768px)  {
+
+    .mobile_header {
+        display: block;
+        z-index: 1;
+    }
+
+    html {
+        font-size: 10px;
+    }
+
+
+    #header {
+        background-position-x: calc(6rem + 2.5vw - 50rem / 16 + 12px);
+        padding-left: calc(6rem + 2.5vw + 50rem / 16 + 7px + 10px);
+        width: 100%;
+    }
+
+    #side_bar{
+        display: block;
+        position: fixed;
+        top: 0;
+        left: -25em;
+        width: 14rem;
+        height: 100%;
+        overflow-y: auto;
+        z-index: 10;
+        padding: 1em 1em 0;
+        -webkit-transition: left .5s ease-in-out .1s;
+        -moz-transition: left .5s ease-in-out .1s;
+        -ms-transition: left .5s ease-in-out .1s;
+        -o-transition: left .5s ease-in-out .1s;
+        transition: left .5s ease-in-out .1s;
+    }
+
+    #main_side_bar{
+        display: flex;
+        position: fixed;
+        top: 0px;
+        left: -25em;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        z-index: 30;
+        margin-left: 0;
+        padding: 1em 1em 0em;
+        -webkit-transition: left .5s ease-in-out .1s, top var(--side_bar_spread_time) ease-in-out 0s, height  var(--side_bar_spread_time) ease-in-out, padding var(--side_bar_spread_time) ease-in-out;
+        -moz-transition: left .5s ease-in-out .1s, top var(--side_bar_spread_time) ease-in-out 0s, height  var(--side_bar_spread_time) ease-in-out, padding var(--side_bar_spread_time) ease-in-out;
+        -ms-transition: left .5s ease-in-out .1s, top var(--side_bar_spread_time) ease-in-out 0s, height  var(--side_bar_spread_time) ease-in-out, padding var(--side_bar_spread_time) ease-in-out;
+        -o-transition: left .5s ease-in-out .1s, top var(--side_bar_spread_time) ease-in-out 0s, height  var(--side_bar_spread_time) ease-in-out, padding var(--side_bar_spread_time) ease-in-out;
+        transition: left .5s ease-in-out .1s, top var(--side_bar_spread_time) ease-in-out 0s, height  var(--side_bar_spread_time) ease-in-out, padding var(--side_bar_spread_time) ease-in-out;
+        pointer-events: none;
+    }
+
+    #main_side_bar > .fantasy_guide_div_1 {
+        padding-right: 1.4375rem;
+    }
+
+    .open_menu a {
+        position: fixed;
+        display: flex;
+        top: 10px;
+        left: 10px;
+        z-index: 15;
+        font-family: "AaGothic", Arial, Helvetica, sans-serif;
+        font-size: 22px;
+        width: 30px;
+        height: 30px;
+        line-height: .9em;
+        text-align: center;
+        border: .2em solid #888;
+        background-color: #fff;
+        border-radius: 3em;
+        color: #888;
+        text-decoration: none;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #main_side_bar:target {
+        top: 0;
+        display: flex;
+        left: 0;
+        width: 100%;
+        margin-left: 0;
+        z-index: 30;
+        padding-bottom: 1em;
+    }
+
+    .side_bar_is_open#main_side_bar:target {
+        top: calc((100vh - 530px) / 2);
+        height: 530px;
+    }
+
+    .close_menu {
+        display: none;
+    }
+
+    #main_side_bar:target .close_menu {
+        display: block;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(0,0,0,.3);
+        z-index: -1;
+        pointer-events: all;
+    }
+
+    #main_content {
+        width: 96vw;
+        padding-left: 2vw;
+        padding-right: 0vw;
+    }
+
+    .fantasy_guide_div_1 {
+        border-style: solid;
+    }
+
+    #main_side_bar > .fantasy_guide_div_1 {
+        width: calc(12rem + 12vw);
+        z-index: 20;
+    }
+
+    .side_bar_is_open#main_side_bar .fantasy_guide_div_1.to_left_top {
+        width: calc(100vw - 2em - 14px);
+        height: calc(100% - 10px);
+    }
+
+    .main_content_content {
+        aspect-ratio: 1/3;
+    }
+
+    .about_link span{
+        font-size: 16px;
+    }
+
+    #AQ {
+        max-width: 14.1rem;
+    }
+
+    .login_wrap {
+        margin-right: 0px;
+    }
+
+    .login_wrap::after {
+        --image-mask: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.1) 33%, black);;
+        right: calc(-1px + 140rem / 16 / 2 + 0.667px);
+    }
+
+    .omikuji_wrap {
+        
+right: calc(50vw - 70vh / 3.1415926 / 2);
+        
+top: calc(-68vh + 140rem / 16 + 20px);
+    }
+}
+
+
+.omikuji_hanzi {
+    transform: rotate(90deg);
+    aspect-ratio: 1;
+    flex-shrink: 0;
+    width: 1em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.omikuji_number_wrap {
+    margin: 2.5vh;
+    padding: 0.6vh;
+    background: lightgray;
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: calc(70vh / 6 - 2 * 3.1vh);
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.omikuji_number {
+    border: 0.3vh solid gray;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 0 1vh;
+    position: relative;
+}
+
+.omikuji_content_wrap {
+    flex-grow: 1;
+    padding: 1.2vh;
+    --border-thick: 0.3vh gray solid;
+    --border-thin: 0.1vh gray solid;
+    display: flex;
+    height: calc(100% * 5 / 6);
+}
+
+.omikuji_content_left_right_border_1 {
+    border-left: var(--border-thick);
+    border-right: var(--border-thick);
+    flex-grow: 1;
+    display: flex;
+}
+
+.omikuji_content_left_right_border_2 {
+    border-left: var(--border-thin);
+    border-right: var(--border-thin);
+    flex-grow: 1;
+    display: flex;
+    margin: 0 0.1vh;
+}
+
+.omikuji_content_up_bottom_border_1 {
+    display: flex;
+    flex-grow: 1;
+    margin: 0 0.4vh 0;
+    border-top: var(--border-thick);
+    border-bottom: var(--border-thick);
+}
+
+.omikuji_content_up_bottom_border_2 {
+    display: flex;
+    flex-grow: 1;
+    margin: 0.1vh 0;
+    border-top: var(--border-thin);
+    border-bottom: var(--border-thin);
+    flex-direction: column;
+    align-items: center;
+}
+
+.omikuji_omikuji {
+    font-family: 'YuMincho';
+    font-size: 3vh;
+}
+
+.omikuji_bangou {
+    font-family: 'YuMincho';
+    font-size: 1vh;
+}
+
+div#omikuji_fan {
+    margin-left: 0.8vh;
+}
+
+.omikuji_number::before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0.1vh;
+    right: 0.1vh;
+    top: 0.1vh;
+    bottom: 0.1vh;
+    border: 0.1vh solid gray;
+    filter: opacity(0.5);
+    pointer-events: none;
+}
+
+div#omikuji_num {
+    font-size: 1.5vh;
+}
+
+div#omikuji_di {
+    margin-right: 0.1vh;
+}
+
+div#omikuji_basic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+div#omikuji_bangou_wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    font-family: 'YuMincho';
+    font-size: 2.7vh;
+    border-bottom: var(--border-thin);
+}
+
+div#omikuji_name_wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    border-bottom: var(--border-thick);
+}
+
+div#omikuji_ability {
+    border-bottom: var(--border-thin);
+    margin-bottom: 0.1vh;
+    padding-bottom: 0.8vh;
+    font-family: sans-serif !important;
+    font-weight: 500;
+}
+
+#omikuji_name_wrap > div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-family: 'YuMincho';
+}
+
+div#omikuji_poem {
+    writing-mode: vertical-rl;
+    white-space: normal;
+    height: 5.1em;
+    width: 100%;
+    margin: 1vh 0 1vh 0;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex-shrink: 0;
+    font-family: 'ZZOldMincho';
+    font-weight: bold;
+    font-size: 2vh;
+    justify-content: flex-start;
+    white-space: nowrap;
+}
+
+div#omikuji_fortune_text_1, div#omikuji_fortune_text_2 {
+    writing-mode: vertical-rl;
+    white-space: normal;
+    line-height: 1;
+    height: 50%;
+    width: 95%;
+    padding: 0.8vh 0;
+    margin: 0 -10vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+div#omikuji_fortune_text {
+    display: flex;
+    height: 20vh;
+    width: 90%;
+    flex-grow: 1;
+    flex-direction: column;
+    font-family: 'JinLing';
+    align-items: center;
+}
+
+div#omikuji_name {
+    font-size: 2.3vh;
+    line-height: calc(1.3* 2.3vh);
+}
+
+div#omikuji_title {
+    padding-top: 0.8vh;
+    line-height: calc(1.3* 1vh);
+    font-size: 1vh;
+}
+
+#omikuji_bangou_wrap > div {
+    flex-grow: 1.3;
+    display: flex;
+    justify-content: center;
+    height: 80%;
+    align-items: center;
+    /* width: calc((100% - 0.1vh) / 2); */
+    line-height: 1.7;
+}
+
+div#omikuji_bangou {
+    border-right: var(--border-thin);
+    min-width: 50%;
+    flex-grow: 1.5;
+    font-size: 2.4vh;
+    height: 70%;
+}
+
+.omikuji_inner_text {
+    font-size: 1.0vh;
+    text-indent: -3em;
+    padding-top: 3em;
+    line-height: 1.3vh;
+}
+
+.omikuji_wrap hr {
+    margin: 0;
+    width: 100%;
+    border-width: 0.05vh;
+    border-color: lightgray;
+    box-sizing: border-box;
+}
+
+span.omikuji_temp {
+    font-size: 0.6em;
+}
+
+.omikuji_wrap.show {
+    top: calc(140rem / 16 + 25px);
+    transition: top 0.5s ease-in-out;
+}
+
+a#omikuji_show {
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    top: 0;
+}
+
+a#omikuji_hide {
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.omikuji_fortune_inner {
+    font-size: 0.7em;
+    letter-spacing: -0.18em;
+    transform: scale(2) rotate(-6deg);
+}
+
+div#omikuji_ability {
+    line-height: calc(0.7* 1vh);
+    font-size: 0.8vh;
+}
+
+div#omikuji_fortune {
+    line-height: calc(1.7 * 2.7vh);
+}
+
+.left_padding_div {
+    transition: padding-left var(--side_bar_spread_time) ease;
+    padding-left: calc(12rem + 5vw + 80px);
+    padding-right: 20px;
+}
+
+.top_padding_div {
+    padding-top: calc(140rem / 16 + 40px + 0.667px);
+}
+
+.left_padding_div.main_content_padding_left_shrink {
+    padding-left: calc(50vw - 40px);
+}

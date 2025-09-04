@@ -1,0 +1,520 @@
+
+/* 
+=================
+润植家字体系列 nzgr
+润植家康熙字典美化体 / 润植家刻本简体
+------------------------------
+by 润植家
+来源：https://mp.weixin.qq.com/s/Qr5-0zkUVhc_CYApCZ382g
+=================
+*/
+@font-face { font-family: '润植家康熙字典美化体'; 
+    font-style: normal; font-weight: 400;font-display: swap;
+    src: url('https://fastly.jsdelivr.net/gh/Etinjat/FONT@nzgr/润植家康熙字典美化体.woff2') format('woff2');
+  }
+
+@keyframes FadeIn {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes popOut {
+    from {
+        opacity: 0;
+        transform: scale(0);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes backgroundWiggle {
+    0% {
+        filter: blur(0px);
+        opacity: 1;
+    }
+    100% {
+        filter: blur(150px);
+        opacity: 0.6;
+    }
+}
+
+
+#main_content{
+    height: calc(100vh - 20px - 0.667px - var(--bottom-offset));
+}
+
+.control_wrap {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    background: black;
+    margin-right: 20px;
+}
+
+.game_state_wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    position: relative;
+    background: white;
+    border: 3.5px solid black;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+    padding: 0 20px;
+}
+
+.character_wrap {
+    height: 100%;
+    width: 184px;
+    flex-grow: 0.3;
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+    transition: flex-grow 2s, width 2s, opacity 2s;
+}
+
+div#players_wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 24vw;
+    align-content: space-around;
+    justify-content: center;
+}
+
+div#answers_wrap {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.player.fantasy_guide_div_1 {
+    padding-left: 1rem;
+    padding-top: 0;
+    padding-right: 1rem;
+    padding-bottom: 0;
+    width: calc(12vw - 14px - 2rem);
+    height: calc(100% - 14px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    animation: popOut 0.7s cubic-bezier(0.35, 1.4, 0.7, 1);
+}
+
+button.delete_player_button {
+    position: absolute;
+    min-width: 0;
+    border-image: none;
+    border: solid black 3px;
+    width: 1.7rem;
+    aspect-ratio: 1;
+    top: -1.3rem;
+    left: -1.5rem;
+}
+
+div#main_content.on_load {
+    overflow: visible;
+    flex-wrap: nowrap;
+}
+
+.player_content {
+    height: 50%;
+}
+
+input {
+    border: none;
+    background: none;
+}
+
+input:disabled {
+    color: black;
+}
+
+input.player_name {
+    font-size: 1.4em;
+    font-family: 'LXGW WenKai';
+}
+
+input.player_name {
+    width: calc(100% - 28rem / 8);
+    text-align: center;
+    padding: 0;
+}
+
+button.delete_player_button:disabled {
+    display: none;
+}
+
+input.player_answer {
+    font-size: 2em;
+    font-family: 'YanSong';
+    text-align: center;
+}
+
+.player_score_wrap {
+    width: 100%;
+    height: 1.4rem;
+    border: 1px solid black;
+    border-radius: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.player_score {
+    width: 100%;
+}
+
+.player_name_wrap::before {
+    content: "";
+    display: block;
+    /* position: absolute; */
+    left: calc(23rem / 16);
+    height: calc(39rem / 16);
+    width: calc(28rem / 16);
+    margin: 0;
+    background-color: var(--uni-anti-background-color);
+    --image-mask: url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/Yin.svg);
+    -webkit-mask-image: var(--image-mask);
+    -webkit-mask-position: center;
+    -webkit-mask-size: 1.25rem;
+    -webkit-mask-repeat: no-repeat;
+    -moz-mask-image: var(--image-mask);
+    -moz-mask-position: center;
+    -moz-mask-size: 1.25rem;
+    -moz-mask-repeat: no-repeat;
+    -o-mask-image: var(--image-mask);
+    -o-mask-position: center;
+    -o-mask-size: 1.25rem;
+    -o-mask-repeat: no-repeat;
+    mask-image: var(--image-mask);
+    mask-position: center;
+    mask-size: 1.25rem;
+    mask-repeat: no-repeat;
+}
+
+.player_name_wrap::after {
+    content: "";
+    display: block;
+    /* position: absolute; */
+    right: calc(23rem / 16);
+    height: calc(39rem / 16);
+    width: calc(28rem / 16);
+    margin: 0;
+    background-color: var(--uni-anti-background-color);
+    --image-mask: url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/Yang.svg);
+    -webkit-mask-image: var(--image-mask);
+    -webkit-mask-position: center;
+    -webkit-mask-size: 1.25rem;
+    -webkit-mask-repeat: no-repeat;
+    -moz-mask-image: var(--image-mask);
+    -moz-mask-position: center;
+    -moz-mask-size: 1.25rem;
+    -moz-mask-repeat: no-repeat;
+    -o-mask-image: var(--image-mask);
+    -o-mask-position: center;
+    -o-mask-size: 1.25rem;
+    -o-mask-repeat: no-repeat;
+    mask-image: var(--image-mask);
+    mask-position: center;
+    mask-size: 1.25rem;
+    mask-repeat: no-repeat;
+}
+
+.player_name_wrap {
+    display: flex;
+    justify-content: space-around;
+}
+
+#container::before {
+    content: "";
+    display: block;
+    position: absolute;
+    background-image: linear-gradient(
+90deg, #EF65C8 0% calc(25% - var(--softness)), #57DF0E calc(25% + var(--softness)) calc(50% - var(--softness)), #f07f1f calc(50% + var(--softness)) calc(75% - var(--softness)), #6efdfd calc(75% + var(--softness)) 100%);
+    width: 100%;
+    height: 200vh;
+    top: -50vh;
+    mix-blend-mode: color;
+    pointer-events: none;
+    --softness: 2%;
+    animation: backgroundWiggle 3s infinite alternate;
+}
+
+#container::after {
+    content: "";
+    display: block;
+    position: absolute;
+    background-image: linear-gradient(
+to bottom, white, black);
+    width: 100%;
+    height: 100vh;
+    top: -0vh;
+    pointer-events: none;
+    mix-blend-mode: darken;
+    opacity: 0.05;
+    z-index: -1;
+    /* animation: backgroundWiggle 3s infinite alternate; */
+}
+
+.player_progress {
+    position: absolute;
+    height: 100%;
+    left: 0;
+    min-width: 1rem;
+    transition: width 1s ease;
+    border-radius: 0 0.7rem 0.7rem 0;
+    /* mix-blend-mode: darken; */
+    width: 0%;
+}
+
+span.player_score {
+    text-align: center;
+    z-index: 1;
+}
+
+#players_wrap .player_content:nth-of-type(1) .player_progress {
+    background-color: #EF65C8;
+}
+#players_wrap .player_content:nth-of-type(2) .player_progress {
+    background-color: #57DF0E;
+}
+#players_wrap .player_content:nth-of-type(3) .player_progress {
+    background-color: #f07f1f;
+}
+#players_wrap .player_content:nth-of-type(4) .player_progress {
+    background-color: #6efdfd;
+}
+
+div#container {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.players_wrap_wrap {
+    height: 100%;
+    flex-grow: 1;
+    width: 24vw;
+    transition: flex-grow 2s;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    /* background: rgba(0,255,0,0.1); */
+}
+
+.game_state_wrap_wrap {
+    height: 100%;
+    flex-grow: 1;
+    /* background: rgba(255, 0, 0, 0.1); */
+    transition: flex-grow 2s;
+    display: flex;
+    justify-content: center;
+}
+
+.answers_wrap_wrap {
+    height: 100%;
+    flex-grow: 0.1;
+    /* background: rgba(0, 0, 255, 0.1); */
+    transition: flex-grow 2s;
+    /* overflow: hidden; */
+    width: 0;
+}
+
+.state_rating .game_state_wrap_wrap,
+.state_gaming_idle .game_state_wrap_wrap {
+    flex-grow: 0.1;
+}
+
+.state_rating .character_wrap,
+.state_gaming_idle .character_wrap {
+    flex-grow: 0.1;
+}
+
+.state_rating .players_wrap_wrap,
+.state_gaming_idle .players_wrap_wrap {
+    flex-grow: 0.1;
+}
+
+.state_rating .answers_wrap_wrap, 
+.state_gaming_idle .answers_wrap_wrap {
+    flex-grow: 1;
+}
+
+.answer_wrap {
+    position: absolute;
+    width: 100%;
+    transition: top 0.5s;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+.answer {
+    border-radius: 14px;
+    border: solid black 3.5px;
+    width: 100%;
+    box-sizing: content-box;
+    height: calc(100% - 20%);
+    position: relative;
+    overflow: hidden;
+    background: white;
+    font-size: 2rem;
+    display: flex;
+    font-family: 'AaGothic';
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: nowrap;
+    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+}
+
+.answer::before {
+    content: "";
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    border: solid black 1.5px;
+    left: var(--distance);
+    top: var(--distance);
+    right: var(--distance);
+    bottom: var(--distance);
+    --distance: 2.3px;
+    border-radius: 8.6px;
+    z-index: 1;
+}
+
+.answer_progress {
+    min-width: 100px;
+    position: absolute;
+    height: 100%;
+    background: yellow;
+    left: 0;
+    width: 0%;
+    transition: width 0.5s ease;
+    border-radius: 11.5px;
+}
+
+img#character {
+    aspect-ratio: 2/3;
+    height: 100%;
+    border-radius: 25px;
+    opacity: 0;
+    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+}
+
+input.player_answer::placeholder {
+    color: transparent;
+}
+
+.state_answering input.player_answer::placeholder {
+    color: rgb(198, 198, 198);
+}
+
+.round_info {
+    font-family: 'JinLing', Arial;
+    font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.clock_wrap {color: darkred;font-family: fantasy;font-size: 5rem;text-align: center;}
+
+.clock_wrap_wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.logo_wrap {
+    font-family: '润植家康熙字典美化体', Arial;
+    font-size: 3rem;
+    margin: 0.5rem;
+}
+
+.answer_content {
+    z-index: 1;
+    min-width: 16rem;
+}
+
+.answer_score {
+    z-index: 1;
+}
+
+.answer_content, .answer_score {
+    transition: opacity 1s 1s;
+    opacity: 0;
+    text-shadow: 0 0 1px rgba(0,0,0,0.8);
+}
+
+.state_rating .answer_content, .state_rating .answer_score,
+.state_gaming_idle .answer_content, .state_gaming_idle .answer_score {
+    opacity: 1;
+    animation: FadeIn 2s;
+}
+
+.state_enroll .character_wrap,
+.state_idle .character_wrap {
+    flex-grow: 0.1;
+    overflow: hidden;
+    opacity: 0;
+    width: 0;
+}
+
+input#port_input {
+    font-family: 'AaGothic';
+    font-size: 2rem;
+    width: 6rem;
+    text-align: center;
+}
+
+.port_info {
+    display: flex;
+    justify-content: center;
+}
+
+button#connect_button {
+    font-family: 'AaGothic';
+    font-size: 1.5rem;
+}
+
+.game_state_wrap::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border: 1.5px solid black;
+    left: var(--distance);
+    top: var(--distance);
+    right: var(--distance);
+    bottom: var(--distance);
+    --distance: 2.3px;
+}
+
+.state_answering .character_wrap, .state_stopanswering .character_wrap {
+    flex-grow: 1;
+}
+
+.state_idle img#character {
+    opacity: 0;
+}
+
+.state_answering img#character {
+    transition: opacity 2s;
+}

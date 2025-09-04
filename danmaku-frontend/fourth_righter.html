@@ -4,32 +4,98 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Fourth Righter</title>
+        <link rel="stylesheet" type="text/css" href="/fourth_righter.css">
         <style>
             #omikuji {display: none;}
         </style>
     </head>
     <body>
         <div id="main_content">
-            <button onclick="sendMsg()">发送消息</button>
-            <div id="log"></div>
-            1333333321413
+            <div class="control_wrap">
+                <button id="add_player_btn" onclick="addPlayer()">添加玩家</button>
+                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartEnroll})})">开始报名</button>
+                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartGame})})">开始游戏</button>
+                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartRating})})">开始打分</button>
+                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.EndRating})})">结束打分</button>
+                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.NextRound})})">下一回合</button>
+                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.EndGame})})">结束游戏</button>
+                <button onclick="testSend()">测试弹幕</button>
+            </div>
+            <div class="game_state_wrap_wrap">
+                <div class="game_state_wrap">
+                    <div class="clock_wrap_wrap">
+                        <div class="logo_wrap">四权家异变</div>
+                        <div id="clock" class="clock_wrap">00:00</div>
+                        <div class="round_info">
+                            <div class="game_state"><span id="game_state">待机中</span><span class="round_number"></span></div>
+                            <div class="round_wrap"> / <span class="total_rounds"></span> 回合</div>
+                        </div>
+                        <div class="port_info">
+                            <input type="text" id="port_input" placeholder="端口号" value="8080">
+                            <button id="connect_button" onclick="connect();">连接</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="character_wrap">
+                <img id="character">
+            </div>
+            <div class="players_wrap_wrap">
+                <div id="players_wrap">
+                </div>
+            </div>
+            <div class="answers_wrap_wrap">
+                <div id="answers_wrap"></div>
+            </div>
+            <div id="player_template" class="player_content" style="display:none">
+                <div class="player fantasy_guide_div_1">
+                    <button class="delete_player_button">X</button>
+                    <div class="player_name_wrap"><input type="text" class="player_name"></div>
+                    <input type="text" class="player_answer" disabled placeholder="答案">
+                    <div class="player_score_wrap">
+                        <div class="player_progress"></div>
+                        <span class="player_score">0</span>
+                    </div>
+                </div>
+            </div>
+            <div id="answer_template" class="answer_wrap" style="display:none">
+                <div class="answer">
+                    <div class="answer_progress"></div>
+                    <div class="answer_content"></div>
+                    <div class="answer_score">0</div>
+                </div>
+            </div>
         </div>
     </body>
+    <script src="/fourth_righter_character.js"></script>
+    <script src="/fourth_righter.js"></script>
     <script>
-        const ws = new WebSocket("ws://localhost:8080");
-
-        ws.onopen = () => log("✅ 已连接");
-        ws.onmessage = (e) => log("📩 " + e.data);
-        ws.onclose = () => log("❌ 连接关闭");
-        ws.onerror = (err) => log("⚠️ 出错: " + err);
-
-        function sendMsg() {
-            ws.send("Hello from Browser!");
-            log("➡️ 发送: Hello from Browser!");
-        }
-
-        function log(msg) {
-            document.getElementById("log").innerHTML += msg + "<br>";
+        var Controller = "Admin"; // 控制者的昵称
+        var testPlayers = ["小明", "小红", "小刚", "小华", "小李", "小王", "小赵", "小钱", "小孙", "小周"];
+        var testAnswers = [
+            "我喜欢编程",
+            "我讨厌写作业",
+            "我爱吃冰淇淋",
+            "我想去旅行",
+            "我喜欢看电影",
+            "我讨厌早起",
+            "我爱运动",
+            "我想学吉他"
+        ];
+        var testSenders = ["Alice", "Bob", "Charlie", "Dave", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy", "Kevin", "Laura", "Mallory", "Niaj", "Olivia", "Peggy", "Quentin", "Rupert", "Sybil", "Trent", "Uma", "Victor", "Wendy", "Xander", "Yvonne", "Zack"];
+        function testSend() {
+            if (GameState === GS.Enroll) {
+                const sender = testPlayers[Math.floor(Math.random() * testPlayers.length)];
+                onMessage({data: JSON.stringify({sender: sender, text: '1'})});
+            } else if (GameState === GS.Gaming.Rating) {
+                const sender = testSenders[Math.floor(Math.random() * testSenders.length)];
+                const text = Math.floor(Math.random() * Answers.length) + 1;
+                onMessage({data: JSON.stringify({sender: sender, text: text})});
+            } else if (GameState === GS.Gaming.Answering || GameState === GS.Gaming.StopAnswering) {
+                const sender = Players[Math.floor(Math.random() * Players.length)];
+                const text = testAnswers[Math.floor(Math.random() * testAnswers.length)];
+                onMessage({data: JSON.stringify({sender: sender, text: text})});
+            }
         }
     </script>
 </html>

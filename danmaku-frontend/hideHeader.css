@@ -1,0 +1,34 @@
+#header {
+    top: calc(-140rem/16);
+    transition: top 0.5s ease;
+}
+
+div#main_side_bar {
+    top: calc(21px + 0.667px);
+    transition: left 0.5s 0.1s, top 0.5s ease;
+}
+
+.top_padding_div {
+    padding-top: calc(40px + 0.667px);
+    transition: padding-top 0.5s ease;
+}
+
+div#main_content.on_load {
+    transition: transform 0.5s 0.1s, width var(--side_bar_spread_time) ease;
+}
+
+#header:hover {
+    top: 0;
+}
+
+#header:hover ~ * .top_padding_div {
+    padding-top: calc(140rem / 16 + 40px + 0.667px);
+}
+
+#header:hover ~ * div#main_side_bar {
+    top: calc(140rem / 16 + 21px + 0.667px);
+}
+
+.side_bar_is_open#main_side_bar + #main_content, #main_side_bar:hover + #main_content {
+    transition: transform 0.5s 0.1s, padding-left var(--side_bar_spread_time) ease, width var(--side_bar_spread_time) ease;
+}
