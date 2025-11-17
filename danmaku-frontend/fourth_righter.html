@@ -10,8 +10,8 @@
         </style>
     </head>
     <body>
-        <div id="main_content">
-            <div class="control_wrap">
+        <div id="main_content" class="state_idle">
+            <div id="control_panel" class="control_wrap">
                 <button id="add_player_btn" onclick="addPlayer()">添加玩家</button>
                 <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartEnroll})})">开始报名</button>
                 <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartGame})})">开始游戏</button>
@@ -27,18 +27,29 @@
                         <div class="logo_wrap">四权家异变</div>
                         <div id="clock" class="clock_wrap">00:00</div>
                         <div class="round_info">
-                            <div class="game_state"><span id="game_state">待机中</span><span class="round_number"></span></div>
-                            <div class="round_wrap"> / <span class="total_rounds"></span> 回合</div>
+                            <div class="game_state"><span id="game_state">待机中</span></div>
+                            <div class="round_wrap">第<span id="rounds">0</span>回合</div>
                         </div>
                         <div class="port_info">
-                            <input type="text" id="port_input" placeholder="端口号" value="8080">
+                            <input type="text" id="port_input" placeholder="端口号" value="5098">
+                            /
+                            <input type="text" id="path_input" placeholder="群名" value="弹幕群名">
                             <button id="connect_button" onclick="connect();">连接</button>
                         </div>
                     </div>
+                    <div class="button_wrap">
+                        <a class="button" onclick="toggle_control_panel()">控制面板</a>
+                    </div>
+                    <div class="rule_wrap">
+                        <a class="button" onclick="open_instruction()">规则介绍</a>
+                    </div>
                 </div>
+                <div class="enroll_guide">孩子们，扣1报名参加</div>
             </div>
             <div class="character_wrap">
+                <div class="answer_guide answer_guide_1">请用<span>SMWW</span>的格式描述：<br><span id="character_name">棍木</span></div>
                 <img id="character">
+                <div class="answer_guide answer_guide_2">请观众不要在弹幕群里发言</div>
             </div>
             <div class="players_wrap_wrap">
                 <div id="players_wrap">
@@ -47,11 +58,53 @@
             <div class="answers_wrap_wrap">
                 <div id="answers_wrap"></div>
             </div>
+            <div class="instruction_wrap_wrap">
+                <div id="instruction_wrap" class="instruction_wrap" style="display:none">
+                    <button class="close_instruction_button" onclick="close_instruction()"></button>
+                    <div class="fantasy_guide_div_1 instruction">
+                        <div>
+                            <h1>游戏玩法</h1>
+                            <hr>
+                            <p><b>基本玩法：</b>随机选择一个东方角色，选手按照<span>“SMWW”</span>的格式描述这个角色，由观众进行评分：</p>
+                            <ul>
+                                <li>电棍——死妈<span style="text-decoration:line-through;font-family:Arial">棍狗</span>文文</li>
+                                <li>丘成桐——supersymmetric manifold文文</li>
+                            </ul>
+                            <p><span>“WW”</span>并不一定得是<span>“文文”</span>，一般只考虑<span>“SM文文”</span>更简单。</p>
+                        </div>
+                    </div>
+                    <div class="fantasy_guide_div_1 instruction">
+                        <div>
+                            <h1>游戏流程——报名环节</h1>
+                            <hr>
+                            <p>游戏开始前，由主持人在弹幕群里说<span>“开始报名”</span>后，在弹幕群内扣1报名，报名结果同步在大屏幕上。</p>
+                            <p>凑齐4人后，游戏开始。</p>
+                        </div>
+                    </div>
+                    <div class="fantasy_guide_div_1 instruction">
+                        <div>
+                            <h1>游戏流程——回答环节</h1>
+                            <hr>
+                            <p>游戏开始后，随机抽选一个东方角色，在时限内，选手要按照<span>“SMWW”</span>的格式描述这个角色。</p>
+                            <p><b>注意：回答在弹幕群里进行，在回答环节请观众不要在弹幕群里说话。</b></p>
+                        </div>
+                    </div>
+                    <div class="fantasy_guide_div_1 instruction">
+                        <div>
+                            <h1>游戏流程——评分环节</h1>
+                            <hr>
+                            <p>回答结束后，主持人在弹幕群里说<span>“开始打分”</span>后，由在座的各位观众在弹幕群里发送<b>答案对应的数字</b>进行打分。</p>
+                            <p><b>完全主观评分：</b>如果<span>“2UN”</span>来玩，他回答一个<span>“希腊奶”</span>，大家都投这个答案也可以。</p>
+                            <p>可以更改打分，取最后的一票。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="player_template" class="player_content" style="display:none">
                 <div class="player fantasy_guide_div_1">
                     <button class="delete_player_button">X</button>
-                    <div class="player_name_wrap"><input type="text" class="player_name"></div>
-                    <input type="text" class="player_answer" disabled placeholder="答案">
+                    <div class="player_name_wrap"><input type="text" class="player_name"><div class="player_name_show"></div></div>
+                    <div class="player_answer_wrap"><input type="text" class="player_answer" disabled placeholder="答案"><div class="player_answer_show"></div></div>
                     <div class="player_score_wrap">
                         <div class="player_progress"></div>
                         <span class="player_score">0</span>
@@ -70,17 +123,15 @@
     <script src="/fourth_righter_character.js"></script>
     <script src="/fourth_righter.js"></script>
     <script>
-        var Controller = "Admin"; // 控制者的昵称
-        var testPlayers = ["小明", "小红", "小刚", "小华", "小李", "小王", "小赵", "小钱", "小孙", "小周"];
+        var Controller = "Nipporita"; // 控制者的昵称
+        var testPlayers = ["小明明明明明明明", "小红红红红", "小刚刚", "小华华华华", "小李李李李李李李李李李李李李", "小王王王王", "小赵赵赵赵赵赵赵", "小钱钱钱钱钱钱钱钱钱钱钱", "小孙孙孙孙孙", "小周周周周周"];
         var testAnswers = [
-            "我喜欢编程",
-            "我讨厌写作业",
-            "我爱吃冰淇淋",
-            "我想去旅行",
-            "我喜欢看电影",
-            "我讨厌早起",
-            "我爱运动",
-            "我想学吉他"
+            "Sister's Mother文文",
+            "Start Masturbate文文",
+            "Study Manifold文文",
+            "死妈文文",
+            "Suck命文文",
+            "隙间文文"
         ];
         var testSenders = ["Alice", "Bob", "Charlie", "Dave", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy", "Kevin", "Laura", "Mallory", "Niaj", "Olivia", "Peggy", "Quentin", "Rupert", "Sybil", "Trent", "Uma", "Victor", "Wendy", "Xander", "Yvonne", "Zack"];
         function testSend() {
@@ -96,6 +147,52 @@
                 const text = testAnswers[Math.floor(Math.random() * testAnswers.length)];
                 onMessage({data: JSON.stringify({sender: sender, text: text})});
             }
+        }
+    </script>
+    <script>
+        function open_instruction() {
+            const wrap = document.getElementById("instruction_wrap");
+            wrap.style.display = "";
+        }
+
+        function close_instruction() {
+            const wrap = document.getElementById("instruction_wrap");
+            wrap.style.display = "none";
+        }
+
+        var instructions = document.getElementsByClassName("instruction");
+        for (let i = 0; i < instructions.length; i++) {
+            let e = instructions[i];
+
+            if (i !== 0) {
+                e.style.display = "none";
+            }
+
+            if (i !== 0) {
+                var previous_button = document.createElement("button");
+                previous_button.className = "prev-button";
+                previous_button.onclick = function() {
+                    e.style.display = "none";
+                    instructions[i - 1].style.display = "";
+                };
+                e.appendChild(previous_button);
+            }
+            
+            if (i !== instructions.length - 1) {
+                var next_button = document.createElement("button");
+                next_button.className = "next-button";
+                next_button.onclick = function() {
+                    e.style.display = "none";
+                    instructions[i + 1].style.display = "";
+                };
+                e.appendChild(next_button);
+            }
+        }
+    </script>
+    <script>
+        function toggle_control_panel() {
+            const wrap = document.getElementById("control_panel");
+            wrap.classList.toggle("open");
         }
     </script>
 </html>

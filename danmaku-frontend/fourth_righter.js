@@ -28,12 +28,14 @@ var log = console.log
 ///// WS 部分
 let ws = null;
 let reconnectTimer = null;
-let port = 8080;
-const WS_URL_Head = "ws://localhost:";
+let path = "弹幕群名";
+let port = 5099;
+const WS_URL_Head = "ws://localhost";
 let reconnectDelay = 3000; // 初始延迟 3 秒
 
 function connect() {
     const portInput = document.getElementById("port_input");
+    const pathInput = document.getElementById("path_input");
     const connectButton = document.getElementById("connect_button");
     if (portInput && portInput.value) {
         const p = parseInt(portInput.value);
@@ -44,7 +46,13 @@ function connect() {
             portInput.value = port;
         }
     }
-    const WS_URL = WS_URL_Head + port;
+    if (pathInput && pathInput.value) {
+        path = pathInput.value;
+    } else {
+        log("⚠️ 路径不能为空，使用默认路径 " + path);
+        pathInput.value = path;
+    }
+    const WS_URL = WS_URL_Head + ":" + port + "/danmaku/" + encodeURIComponent(path);
 
     // 先清理旧连接
     disconnect();
@@ -193,7 +201,9 @@ function StopAnswering() {
 }
 
 async function newGame() {
-    CurrentRound = 0;
+    CurrentRound = 1;
+    const rounds = document.getElementById("rounds");
+    rounds.innerText = CurrentRound;
     frozenPlayers();
     Players = getPlayers();
     // 如果相同
@@ -209,7 +219,7 @@ async function newGame() {
     unfrozenAnswers();
     resetCharacters();
     await chooseCharacter();
-    await countingDown(30);
+    await countingDown(60);
     StopAnswering();
 }
 
@@ -224,18 +234,26 @@ function endGame() {
 }
 
 async function nextRound() {
-    CurrentRound += 1;
+    if (Answers.length !== 0) {
+        CurrentRound += 1;
+    }
+    const rounds = document.getElementById("rounds");
+    rounds.innerText = CurrentRound;
+    const instructionsElement = Array.from(document.getElementsByClassName("answer_guide"));
+    instructionsElement.forEach(e => {e.style.opacity = '';})
     resetAnswers();
     resetAudiencesRating();
     removeAnswersInDocument();
     unfrozenAnswers();
     await chooseCharacter();
-    await countingDown(30);
+    await countingDown(60);
     StopAnswering();
 }
 
 function startRating() {
     frozenAnswers();
+    const instructionsElement = Array.from(document.getElementsByClassName("answer_guide"));
+    instructionsElement.forEach(e => {e.style.opacity = '';})
     var playerElements = getActivePlayerElements(".player");
     for (var i = 0; i < playerElements.length; i++) {
         var pe = playerElements[i];
@@ -415,6 +433,20 @@ function updateAnswersScores() {
 }
 
 ///////////////////////////// 和document操作的部分
+
+function fixTextWidth(e, offset = 28.0 / 8) {
+    var parentWidth = e.parentElement.clientWidth;
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize); // 1rem 对应多少像素
+    var targetWidth = parentWidth - (offset * rem);
+    var width = e.clientWidth;
+    if (width > targetWidth) {
+        var scale = targetWidth / width;
+        e.style.transform = "scaleX(" + scale + ")";
+    } else {
+        e.style.transform = "";
+    }
+}
+
 function addPlayer(name = "") {
     // temp
 
@@ -446,10 +478,29 @@ function addPlayer(name = "") {
     var playerName = newPlayer.getElementsByClassName("player_name")[0];
     if (name !== "") {
         playerName.value = name;
-        playerName.disabled = true; // 报名的玩家不允许修改昵称
+        // playerName.disabled = true; // 报名的玩家不允许修改昵称
     } else {
         playerName.focus();
     }
+
+    var playerNameShow = newPlayer.getElementsByClassName("player_name_show")[0];
+    if (name !== "") {
+        playerNameShow.innerText = name;
+    }
+
+    playerName.addEventListener("input", () => {
+        playerNameShow.innerText = playerName.value;
+        fixTextWidth(playerNameShow);
+    });
+    fixTextWidth(playerNameShow);
+
+    var playerAnswer = newPlayer.getElementsByClassName("player_answer")[0];
+    var playerAnswerShow = newPlayer.getElementsByClassName("player_answer_show")[0];
+    playerAnswer.addEventListener("input", () => {
+        playerAnswerShow.innerText = playerAnswer.value;
+        fixTextWidth(playerAnswerShow);
+    });
+    fixTextWidth(playerAnswerShow, 0);
 
     if (getActivePlayerElements(".player_name").length >= MaxPlayers) {
         hideAddPlayerButton();
@@ -462,6 +513,7 @@ function deletePlayer(e) {
         showAddPlayerButton();
     }
 }
+
 
 function frozenPlayers() {
     var inputs = getActivePlayerElements(".player_name");
@@ -588,6 +640,9 @@ function playerAnswer(data) {
         if (name === pname) {
             var answerInput = pe.getElementsByClassName("player_answer")[0];
             answerInput.value = panswer;
+            var answerShow = pe.getElementsByClassName("player_answer_show")[0];
+            answerShow.innerText = panswer;
+            fixTextWidth(answerShow, 0);
             PlayersAnswers[pname] = panswer;
             break;
         }
@@ -645,15 +700,20 @@ function updateGameStateInDocument() {
 function updateCharacterInDocument() {
     return new Promise((resolve, reject) => {
         const characterElement = document.getElementById("character");
+        const instructionsElement = Array.from(document.getElementsByClassName("answer_guide"));
+        const characterName = document.getElementById("character_name");
         //"url(" + characterImageHead + hand + ".png)"
         if (character !== null) {
+            characterName.innerText = character;
             characterElement.src = characterImageHead + character + ".png";
             // 等加载完成再设置opacity
             characterElement.onload = () => {
+                instructionsElement.forEach(e => {e.style.opacity = 1;})
                 characterElement.style.opacity = 1;
                 resolve();
             };
         } else {
+            characterName.innerText = "棍木";
             characterElement.src = "";
             characterElement.style.opacity = 0;
             resolve();

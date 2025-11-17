@@ -1,0 +1,11 @@
+#main_side_bar{
+    display: none;
+}
+
+.left_padding_div {
+    padding: 0 20px;
+}
+
+div#main_content {
+    width: calc(100vw - 40px);
+}

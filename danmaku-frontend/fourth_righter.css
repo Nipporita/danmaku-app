@@ -56,8 +56,14 @@ by 润植家
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    background: black;
-    margin-right: 20px;
+    width: 0;
+    /* overflow: hidden; */
+    height: 100%;
+    align-items: center;
+    justify-content: space-between;
+    margin-right: 0;
+    opacity: 0;
+    transition: margin-right 0.5s 0.25s, width 0.5s 0.25s, opacity 0.5s;
 }
 
 .game_state_wrap {
@@ -82,6 +88,8 @@ by 润植家
     display: flex;
     justify-content: center;
     transition: flex-grow 2s, width 2s, opacity 2s;
+    position: relative;
+    align-items: center;
 }
 
 div#players_wrap {
@@ -102,15 +110,16 @@ div#answers_wrap {
 
 .player.fantasy_guide_div_1 {
     padding-left: 1rem;
-    padding-top: 0;
+    padding-top: var(--padding-bt);
     padding-right: 1rem;
-    padding-bottom: 0;
+    padding-bottom: var(--padding-bt);
     width: calc(12vw - 14px - 2rem);
-    height: calc(100% - 14px);
+    height: calc(100% - 14px - 2 * var(--padding-bt));
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     animation: popOut 0.7s cubic-bezier(0.35, 1.4, 0.7, 1);
+    --padding-bt: 0px;
 }
 
 button.delete_player_button {
@@ -151,6 +160,7 @@ input.player_name {
     width: calc(100% - 28rem / 8);
     text-align: center;
     padding: 0;
+    opacity: 0;
 }
 
 button.delete_player_button:disabled {
@@ -161,6 +171,8 @@ input.player_answer {
     font-size: 2em;
     font-family: 'YanSong';
     text-align: center;
+    width: calc(100% - 4px);
+    opacity: 0;
 }
 
 .player_score_wrap {
@@ -238,6 +250,7 @@ input.player_answer {
 .player_name_wrap {
     display: flex;
     justify-content: space-around;
+    position: relative;
 }
 
 #container::before {
@@ -267,7 +280,7 @@ to bottom, white, black);
     pointer-events: none;
     mix-blend-mode: darken;
     opacity: 0.05;
-    z-index: -1;
+    z-index: -10;
     /* animation: backgroundWiggle 3s infinite alternate; */
 }
 
@@ -323,6 +336,8 @@ div#container {
     transition: flex-grow 2s;
     display: flex;
     justify-content: center;
+    position: relative;
+    align-items: center;
 }
 
 .answers_wrap_wrap {
@@ -430,7 +445,7 @@ input.player_answer::placeholder {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     font-size: 1.8rem;
     line-height: 1;
 }
@@ -446,7 +461,8 @@ input.player_answer::placeholder {
 .logo_wrap {
     font-family: '润植家康熙字典美化体', Arial;
     font-size: 3rem;
-    margin: 0.5rem;
+    margin: 1rem 0.5rem 0rem;
+    text-align: center;
 }
 
 .answer_content {
@@ -478,21 +494,23 @@ input.player_answer::placeholder {
     width: 0;
 }
 
-input#port_input {
+.port_info input, .port_info span {
     font-family: 'AaGothic';
-    font-size: 2rem;
-    width: 6rem;
+    font-size: 1rem;
     text-align: center;
 }
 
 .port_info {
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 button#connect_button {
     font-family: 'AaGothic';
-    font-size: 1.5rem;
+    font-size: 1rem;
+    margin: 0;
+    border-radius: 1rem;
 }
 
 .game_state_wrap::before {
@@ -517,4 +535,318 @@ button#connect_button {
 
 .state_answering img#character {
     transition: opacity 2s;
+}
+
+.rule_wrap, .button_wrap {
+    position: absolute;
+    width: 2rem;
+    line-height: 1rem;
+    z-index: 2;
+    font-family: "YanSong", Arial, Helvetica, sans-serif;
+    transform: scale(1.3);
+}
+
+.rule_wrap::before, .button_wrap::before {
+    content: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/background_image_1.svg");
+    position: absolute;
+    width: 100%;
+    z-index: -1;
+    transform: scale(2.3);
+    filter: drop-shadow(0px 0px 1px rgba(0,0,0,0.3));
+}
+
+.instruction_wrap {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.instruction {
+    z-index: 11;
+    width: 50vw;
+    height: 60vh;
+    padding-left: 4rem;
+    padding-right: 4rem;
+}
+
+button.close_instruction_button {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    left: 0;
+    z-index: 9;
+    opacity: 0.3;
+    background-color: black;
+    padding: 0;
+    margin: 0;
+}
+
+.prev-button, .next-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    cursor: pointer;
+    min-height: 0px;
+    padding: 0;
+    margin: 0;
+    background: none;
+    filter: drop-shadow(0px 0px 3px black);
+    z-index: 2;
+}
+
+.prev-button::before,
+.next-button::before {
+    content: "";
+    display: block;
+    opacity: 0;
+    width: 30px;
+    aspect-ratio: 1/2;
+    filter: drop-shadow(0px 0px 4px white);
+}
+
+.prev-button::after,
+.next-button::after {
+    display: block;
+    position: absolute;
+    width: 30px;
+    aspect-ratio: 1/2;
+    top: 0;
+    background: white;
+    content: "";
+    -webkit-mask-image: var(--image-mask);
+    -webkit-mask-position: center;
+    -webkit-mask-size: 30px;
+    -webkit-mask-repeat: no-repeat;
+    -moz-mask-image: var(--image-mask);
+    -moz-mask-position: center;
+    -moz-mask-size: 30px;
+    -moz-mask-repeat: no-repeat;
+    -o-mask-image: var(--image-mask);
+    -o-mask-position: center;
+    -o-mask-size: 30px;
+    -o-mask-repeat: no-repeat;
+    mask-image: var(--image-mask);
+    mask-position: center;
+    mask-size: 30px;
+    mask-repeat: no-repeat;
+    filter: blur(0px);
+}
+
+.prev-button::after {
+    --image-mask: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/left_arrow.svg")
+}
+
+.next-button::after {
+    --image-mask: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/right_arrow.svg")
+}
+
+.prev-button {
+    left: 1rem;
+}
+
+.next-button {
+    right: 1rem;
+}
+
+button.next-button, button.prev-button {
+    border: none;
+    min-width: 0;
+}
+
+.instruction > div {
+    position: relative
+}
+
+
+
+.instruction hr::before {
+    left: 0;
+}
+.instruction hr::after {
+    right: 0;
+}
+
+.instruction ul {
+    margin: -0.3em 0;
+}
+
+.answer_guide {
+    position: absolute;
+    /* height: 50%; */
+    align-items: center;
+    /* top: 25%; */
+    background: white;
+    border: 3.5px solid black;
+    box-sizing: border-box;
+    border-radius: 22px;
+    width: calc(10rem + 7px);
+    font-size: 1.5em;
+    font-family: 'JinLing', Arial;
+    font-weight: bold;
+    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+    line-height: 1;
+    padding: 0.5rem;
+    opacity: 0;
+    transition: opacity 2s 1s;
+    --width: calc(10rem + 7px);
+}
+
+.answer_guide::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border: 1.5px solid black;
+    left: var(--distance);
+    top: var(--distance);
+    right: var(--distance);
+    bottom: var(--distance);
+    --distance: 2.3px;
+    border-radius: calc(22px - 1.5px - var(--distance));
+}
+
+.answer_guide_1 {
+    right: calc(-0.5 * var(--width) + 10px);
+}
+
+.answer_guide_2 {
+    left: calc(-0.5 * var(--width) + 10px);
+}
+
+.state_answering .answer_guide, .state_stopanswering .answer_guide {
+    opacity: 1;
+}
+
+.state_rating .answer_guide {
+    transition: opacity 1s;
+}
+
+#port_input {
+    width: 2.5rem;
+}
+
+#path_input {
+    width: 13rem;
+}
+
+.enroll_guide {
+    position: absolute;
+    align-items: center;
+    background: white;
+    border: 3.5px solid black;
+    box-sizing: border-box;
+    border-radius: 22px;
+    width: var(--width);
+    font-size: 1.5em;
+    font-family: 'JinLing', Arial;
+    font-weight: bold;
+    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+    line-height: 1;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 1s;
+    right: calc(-1 * var(--width) / 2);
+    font-size: 2rem;
+    --width: calc(13rem + 7px);
+}
+
+.enroll_guide::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border: 1.5px solid black;
+    left: var(--distance);
+    top: var(--distance);
+    right: var(--distance);
+    bottom: var(--distance);
+    --distance: 2.3px;
+    border-radius: calc(22px - 1.5px - var(--distance));
+}
+.state_enroll .enroll_guide {
+    opacity: 1;
+}
+
+.button_wrap {
+    left: calc(-1rem - 2px);
+    top: 28%;
+}
+
+.rule_wrap {
+    right: calc(-1rem - 2px);
+    bottom: 28%;
+}
+
+.open.control_wrap {
+    width: calc(4em + 12px);
+    margin-right: 20px;
+    opacity: 1;
+    transition: margin-right 0.5s, width 0.5s, opacity 0.5s 0.25s;
+}
+
+.control_wrap button {
+    margin: 0;
+    width: calc(4em + 18px);
+    border: 3px solid black;
+    border-radius: 8px;
+    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+}
+
+p {
+    margin-block: 0.5em;
+}
+
+.player_name_show {
+    position: absolute;
+    height: 100%;
+    font-size: 1.4em;
+    font-family: 'LXGW WenKai';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+input.player_name:focus {
+    opacity: 1;
+}
+
+input.player_name:focus + .player_name_show {
+    opacity: 0;
+}
+
+.player_answer_wrap {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player_answer_show {
+    position: absolute;
+    opacity: 1;
+    font-size: 2em;
+    font-family: 'YanSong';
+    height: 100%;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+input.player_answer:focus {
+    opacity: 1;
+}
+
+input.player_answer:focus + .player_answer_show {
+    opacity: 0;
 }
