@@ -134,7 +134,21 @@
             "隙间文文"
         ];
         var testSenders = ["Alice", "Bob", "Charlie", "Dave", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy", "Kevin", "Laura", "Mallory", "Niaj", "Olivia", "Peggy", "Quentin", "Rupert", "Sybil", "Trent", "Uma", "Victor", "Wendy", "Xander", "Yvonne", "Zack"];
+        
+        var testSendCount = 0;
         function testSend() {
+            testSendCount = 100;
+            function _testSend_next() {
+                if (testSendCount > 0) {
+                    _testSend();
+                    testSendCount--;
+                    setTimeout(_testSend_next, Math.random() * 500);
+                }
+            }
+            _testSend_next();
+        }
+
+        function _testSend() {
             if (GameState === GS.Enroll) {
                 const sender = testPlayers[Math.floor(Math.random() * testPlayers.length)];
                 onMessage({data: JSON.stringify({sender: sender, text: '1'})});

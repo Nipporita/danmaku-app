@@ -49,7 +49,7 @@ by 润植家
 
 
 #main_content{
-    height: calc(100vh - 20px - 0.667px - var(--bottom-offset));
+    height: calc(100vh - 20rem / 16 - 0.667px - var(--bottom-offset));
 }
 
 .control_wrap {
@@ -73,11 +73,11 @@ by 润植家
     justify-content: space-evenly;
     position: relative;
     background: white;
-    border: 3.5px solid black;
+    border: calc(3.5rem / 16) solid black;
     box-sizing: border-box;
     position: relative;
-    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
-    padding: 0 20px;
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
+    padding: 0 calc(20rem / 16);
 }
 
 .character_wrap {
@@ -113,8 +113,8 @@ div#answers_wrap {
     padding-top: var(--padding-bt);
     padding-right: 1rem;
     padding-bottom: var(--padding-bt);
-    width: calc(12vw - 14px - 2rem);
-    height: calc(100% - 14px - 2 * var(--padding-bt));
+    width: calc(12vw - 14rem / 16 - 2rem);
+    height: calc(100% - 14rem / 16 - 2 * var(--padding-bt));
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -126,11 +126,12 @@ button.delete_player_button {
     position: absolute;
     min-width: 0;
     border-image: none;
-    border: solid black 3px;
+    border: solid black calc(3rem / 16);
     width: 1.7rem;
     aspect-ratio: 1;
     top: -1.3rem;
     left: -1.5rem;
+    font-size: 1rem;
 }
 
 div#main_content.on_load {
@@ -178,7 +179,7 @@ input.player_answer {
 .player_score_wrap {
     width: 100%;
     height: 1.4rem;
-    border: 1px solid black;
+    border: calc(1rem / 16) solid black;
     border-radius: 0.7rem;
     display: flex;
     align-items: center;
@@ -372,15 +373,15 @@ div#container {
 .answer_wrap {
     position: absolute;
     width: 100%;
-    transition: top 0.5s;
+    transition: top 0.5s, transform 0.2s;
     display: flex;
     align-items: center;
     flex-direction: row;
 }
 
 .answer {
-    border-radius: 14px;
-    border: solid black 3.5px;
+    border-radius: calc(14rem / 16);
+    border: solid black calc(3.5rem / 16);
     width: 100%;
     box-sizing: content-box;
     height: calc(100% - 20%);
@@ -394,7 +395,7 @@ div#container {
     justify-content: space-evenly;
     align-items: center;
     flex-wrap: nowrap;
-    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
 }
 
 .answer::before {
@@ -402,13 +403,13 @@ div#container {
     display: block;
     position: absolute;
     pointer-events: none;
-    border: solid black 1.5px;
+    border: solid black calc(1.5rem / 16);
     left: var(--distance);
     top: var(--distance);
     right: var(--distance);
     bottom: var(--distance);
-    --distance: 2.3px;
-    border-radius: 8.6px;
+    --distance: calc(2.3rem / 16);
+    border-radius: calc(8.6rem / 16);
     z-index: 1;
 }
 
@@ -426,9 +427,9 @@ div#container {
 img#character {
     aspect-ratio: 2/3;
     height: 100%;
-    border-radius: 25px;
+    border-radius: calc(25rem / 16);
     opacity: 0;
-    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
 }
 
 input.player_answer::placeholder {
@@ -504,6 +505,7 @@ input.player_answer::placeholder {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 1rem;
 }
 
 button#connect_button {
@@ -517,12 +519,12 @@ button#connect_button {
     content: "";
     position: absolute;
     pointer-events: none;
-    border: 1.5px solid black;
+    border: calc(1.5rem / 16) solid black;
     left: var(--distance);
     top: var(--distance);
     right: var(--distance);
     bottom: var(--distance);
-    --distance: 2.3px;
+    --distance: calc(2.3rem / 16);
 }
 
 .state_answering .character_wrap, .state_stopanswering .character_wrap {
@@ -539,8 +541,8 @@ button#connect_button {
 
 .rule_wrap, .button_wrap {
     position: absolute;
-    width: 2rem;
-    line-height: 1rem;
+    width: 2em;
+    line-height: 1em;
     z-index: 2;
     font-family: "YanSong", Arial, Helvetica, sans-serif;
     transform: scale(1.3);
@@ -552,7 +554,7 @@ button#connect_button {
     width: 100%;
     z-index: -1;
     transform: scale(2.3);
-    filter: drop-shadow(0px 0px 1px rgba(0,0,0,0.3));
+    filter: drop-shadow(0px 0px 2px rgba(0,0,0,0.3));
 }
 
 .instruction_wrap {
@@ -591,14 +593,14 @@ button.close_instruction_button {
 .prev-button, .next-button {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(calc(-30rem / 16));
     border: none;
     cursor: pointer;
     min-height: 0px;
     padding: 0;
     margin: 0;
     background: none;
-    filter: drop-shadow(0px 0px 3px black);
+    filter: drop-shadow(0px 0px calc(3rem / 16) black);
     z-index: 2;
 }
 
@@ -607,16 +609,16 @@ button.close_instruction_button {
     content: "";
     display: block;
     opacity: 0;
-    width: 30px;
+    width: calc(30rem / 16);
     aspect-ratio: 1/2;
-    filter: drop-shadow(0px 0px 4px white);
+    filter: drop-shadow(0px 0px calc(4rem / 16) white);
 }
 
 .prev-button::after,
 .next-button::after {
     display: block;
     position: absolute;
-    width: 30px;
+    width: calc(30rem / 16);
     aspect-ratio: 1/2;
     top: 0;
     background: white;
@@ -635,7 +637,7 @@ button.close_instruction_button {
     -o-mask-repeat: no-repeat;
     mask-image: var(--image-mask);
     mask-position: center;
-    mask-size: 30px;
+    mask-size: calc(30rem / 16);
     mask-repeat: no-repeat;
     filter: blur(0px);
 }
@@ -684,32 +686,32 @@ button.next-button, button.prev-button {
     align-items: center;
     /* top: 25%; */
     background: white;
-    border: 3.5px solid black;
+    border: calc(3.5rem / 16) solid black;
     box-sizing: border-box;
-    border-radius: 22px;
-    width: calc(10rem + 7px);
+    border-radius: calc(22rem / 16);
+    width: calc(10rem + 7rem / 16);
     font-size: 1.5em;
     font-family: 'JinLing', Arial;
     font-weight: bold;
-    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
     line-height: 1;
     padding: 0.5rem;
     opacity: 0;
     transition: opacity 2s 1s;
-    --width: calc(10rem + 7px);
+    --width: calc(10rem + 7rem / 16);
 }
 
 .answer_guide::before {
     content: "";
     position: absolute;
     pointer-events: none;
-    border: 1.5px solid black;
+    border: calc(1.5rem / 16) solid black;
     left: var(--distance);
     top: var(--distance);
     right: var(--distance);
     bottom: var(--distance);
-    --distance: 2.3px;
-    border-radius: calc(22px - 1.5px - var(--distance));
+    --distance: calc(2.3rem / 16);
+    border-radius: calc(22rem / 16 - 1.5rem / 16 - var(--distance));
 }
 
 .answer_guide_1 {
@@ -740,34 +742,34 @@ button.next-button, button.prev-button {
     position: absolute;
     align-items: center;
     background: white;
-    border: 3.5px solid black;
+    border: calc(3.5rem / 16) solid black;
     box-sizing: border-box;
-    border-radius: 22px;
+    border-radius: calc(22rem / 16);
     width: var(--width);
     font-size: 1.5em;
     font-family: 'JinLing', Arial;
     font-weight: bold;
-    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
     line-height: 1;
     padding: 1rem;
     opacity: 0;
     transition: opacity 1s;
     right: calc(-1 * var(--width) / 2);
     font-size: 2rem;
-    --width: calc(13rem + 7px);
+    --width: calc(13rem + 7rem / 16);
 }
 
 .enroll_guide::before {
     content: "";
     position: absolute;
     pointer-events: none;
-    border: 1.5px solid black;
+    border: calc(1.5rem / 16) solid black;
     left: var(--distance);
     top: var(--distance);
     right: var(--distance);
     bottom: var(--distance);
-    --distance: 2.3px;
-    border-radius: calc(22px - 1.5px - var(--distance));
+    --distance: calc(2.3rem / 16);
+    border-radius: calc(22rem / 16 - 1.5rem / 16 - var(--distance));
 }
 .state_enroll .enroll_guide {
     opacity: 1;
@@ -784,18 +786,19 @@ button.next-button, button.prev-button {
 }
 
 .open.control_wrap {
-    width: calc(4em + 12px);
-    margin-right: 20px;
+    width: calc(4rem + 1.75rem);
+    margin-right: calc(20rem / 16);
     opacity: 1;
     transition: margin-right 0.5s, width 0.5s, opacity 0.5s 0.25s;
 }
 
 .control_wrap button {
     margin: 0;
-    width: calc(4em + 18px);
-    border: 3px solid black;
-    border-radius: 8px;
-    box-shadow: 0px 0px 11px -4px rgba(0, 0, 0, 0.8);
+    width: calc(4em + 21rem / 16);
+    border: calc(3em / 16) solid black;
+    border-radius: 0.5rem;
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
+    font-size: 1rem;
 }
 
 p {
@@ -849,4 +852,24 @@ input.player_answer:focus {
 
 input.player_answer:focus + .player_answer_show {
     opacity: 0;
+}
+
+body {
+}
+
+html {
+    font-size: 32px;
+}
+
+#header:hover {
+    top: calc(-140rem / 16);
+}
+
+#header:hover ~ * .top_padding_div {
+    padding-top: calc(40rem / 16 + 0.667px);
+}
+
+.answer_wrap.bigger {
+    transform: scale(1.02);
+    transition: top 0.5s;
 }

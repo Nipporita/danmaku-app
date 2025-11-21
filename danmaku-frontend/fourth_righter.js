@@ -130,7 +130,8 @@ function sendMessage(msg) {
 // 前端逻辑
 const MaxPlayers = 4; // 最大玩家数
 
-const characterImageHead = "https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/CharacterCards13/"
+// const characterImageHead = "https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/CharacterCards13/"
+const characterImageHead = "/image/"
 
 var Controller = "Admin"; // 控制者的昵称
 var Players = []; // 玩家昵称列表
@@ -230,6 +231,7 @@ function endGame() {
     removeAnswersInDocument();
     showAddPlayerButton();
     resetCharacters();
+    set_congratulations();
     countingDown(0); // 停止计时
 }
 
@@ -250,7 +252,7 @@ async function nextRound() {
     StopAnswering();
 }
 
-function startRating() {
+async function startRating() {
     frozenAnswers();
     const instructionsElement = Array.from(document.getElementsByClassName("answer_guide"));
     instructionsElement.forEach(e => {e.style.opacity = '';})
@@ -280,9 +282,13 @@ function startRating() {
     AnswersScores = Object.fromEntries(Answers.map(i => [i, 0]));
     Answers4Rank = Answers.slice(); // 复制一份用于排序
     createAnswersInDocument();
+    await countingDown(15);
+    endRating();
 }
 
 function endRating() {
+    GameState = GS.Gaming.Idle;
+    countingDown(0); // 停止计时
     for (var p in PlayersAnswers) {
         var pa = PlayersAnswers[p];
         if (pa in AnswersScores) {
@@ -416,6 +422,7 @@ function getAudienceRate(text) {
 function audienceRate(danmaku) {
     var ar = getAudienceRate(danmaku.text);
     if (ar === null) return; // 无效评分
+    else if (danmaku.sender in Players) return; // 玩家不能评分
     else AudiencesRating[danmaku.sender] = ar;
     updateAnswersScores();
 }
@@ -553,6 +560,9 @@ function clearAnswers() {
     getActivePlayerElements(".player_answer").forEach(e => {
         e.value = "";
     });
+    getActiveAnswerElements(".player_answer_show").forEach(e => {
+        e.innerText = "";
+    });
 }
 
 function hideAddPlayerButton() {
@@ -618,6 +628,9 @@ function updateAnswersScoresInDocument() {
         var maxScore = Math.max(...Object.values(AnswersScores), 0);
         var aw = answerWraps[i];
         aw.style.top = rank * (100./Answers.length) + "%";
+        aw.classList.add('bigger');
+        void aw.offsetWidth; // 触发重绘
+        aw.classList.remove('bigger');
 
         var progressElement = ae.getElementsByClassName("answer_progress")[0];
         progressElement.style.width = (maxScore === 0 ? 0 : (AnswersScores[answerIndex] / maxScore * 100)) + "%";
@@ -757,6 +770,23 @@ function updateClock(seconds) {
     var m = Math.floor(seconds / 60);
     var s = seconds % 60;
     clock.innerText = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+}
+
+function set_congratulations() {
+    var playerElements = getActivePlayerElements(".player");
+    // 求PlayersScores的总分
+    var maxScore = Math.max(...Object.values(PlayersScores), 0);
+    for (var i = 0; i < playerElements.length; i++) {
+        var pe = playerElements[i];
+        var name = pe.getElementsByClassName("player_name")[0].value;
+        var scoreElement = pe.getElementsByClassName("player_score")[0];
+        var playerAnswerShow = pe.getElementsByClassName("player_answer_show")[0];
+        if (name in PlayersScores && PlayersScores[name] === maxScore) {
+            scoreElement.innerText = PlayersScores[name];
+            playerAnswerShow.innerText = "!?强强?!";
+            fixTextWidth(playerAnswerShow, 0);
+        }
+    }
 }
 
 /// 实际代码

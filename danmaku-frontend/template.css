@@ -142,13 +142,13 @@ body {
     padding: 0;
     background-color: var(--uni-background-color);
     --fantasy-guide-logo: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/touhouFantasyGuideLOGO.svg");
-    --bottom-offset: 40px;
+    --bottom-offset: calc(40rem / 16);
 }
 
 button {
-    margin: 5px;
+    margin: calc(5rem / 16);
     border: none;
-    min-height: calc(1rem + 10px);
+    min-height: calc(1rem + 10rem / 16);
 }
 
 button:hover {
@@ -174,7 +174,7 @@ button:hover {
 
 #main_content.on_load {
     transition: width var(--side_bar_spread_time) ease;
-    min-height: calc(100vh - 140rem / 16 - 60px - 0.667px - var(--bottom-offset));
+    min-height: calc(100vh - 140rem / 16 - 60rem / 16 - 0.667px - var(--bottom-offset));
     overflow: hidden;
 }
 
@@ -511,10 +511,11 @@ button:hover {
     font-family: 'LXGW WenKai', Arial, Helvetica, sans-serif;
     align-items: center;
     align-content: center;
+    padding-left: calc(50rem / 16);
 }
 
 #nav_bar li {
-    margin: 0px 10px;
+    margin: 0px calc(10rem / 16);
 }
 
 #nav_bar a,
@@ -525,7 +526,7 @@ button:hover {
 
 #nav_bar > a {
     position: absolute;
-    width: 50px;
+    width: calc(50rem / 16);
     text-align: center;
     transform: translate(0px, 0px);
 }
@@ -1053,12 +1054,12 @@ span.fnnum:hover {
     border-image: var(--fantasy-guide-div-1-border-image);
     border-image-repeat: stretch;
     border-image-slice: 36;
-    border-image-width: 14px;
-    border-image-outset: 7px;
+    border-image-width: calc(14rem / 16);
+    border-image-outset: calc(7rem / 16);
     background: var(--uni-background-color);
     padding: 0.8125rem 1.4375rem;
-    margin: 7px;
-    box-shadow: 0px 0px 11px 3px rgba(0,0,0,0.8);
+    margin: calc(7rem / 16);
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
     color: var(--uni-text-color) !important;
 }
 
@@ -1118,7 +1119,7 @@ div.fantasy_guide_div_1 {
     mask-position: center;
     mask-size: 1.25rem;
     mask-repeat: no-repeat;
-    transform: translate(0px, -18.9px);
+    transform: translate(0px, calc(-18.9rem / 16));
 }
 
 .fantasy_guide_div_1 hr::after {
@@ -1148,7 +1149,7 @@ div.fantasy_guide_div_1 {
     mask-position: center;
     mask-size: 1.25rem;
     mask-repeat: no-repeat;
-    transform: translate(0px, -18.9px);
+    transform: translate(0px, calc(-18.9rem / 16));
 }
 
 .fantasy_guide_div_1 button {

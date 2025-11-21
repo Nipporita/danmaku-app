@@ -9,7 +9,7 @@ div#main_side_bar {
 }
 
 .top_padding_div {
-    padding-top: calc(40px + 0.667px);
+    padding-top: calc(40rem / 16 + 0.667px);
     transition: padding-top 0.5s ease;
 }
 
