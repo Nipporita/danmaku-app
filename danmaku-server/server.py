@@ -232,7 +232,20 @@ class DanmakuServerApp:
         self.update_connections_count()
     
     def update_connections_count(self):
-        self.connections_var.set(f"当前连接: {len(connected_clients)}")
+        # Tkinter 只能在主线程更新；websockets 处理器跑在 asyncio 线程，
+        # 跨线程调用会抛 "main thread is not in main loop"，这里排到主线程执行
+        def _set():
+            try:
+                self.connections_var.set(f"当前连接: {len(connected_clients)}")
+            except Exception:
+                pass
+        try:
+            if threading.current_thread() is threading.main_thread():
+                _set()
+            else:
+                self.root.after(0, _set)
+        except Exception:
+            pass
     
     def broadcast_random_danmaku(self):
         # 在异步事件循环中广播随机弹幕
@@ -248,7 +261,7 @@ class DanmakuServerApp:
                 await self.send_broadcast_danmaku()  # 随机生成并广播
                 await asyncio.sleep(0.1 * random.randint(0,5))  # 间隔 2 秒
         except asyncio.CancelledError:
-            print("✅ 自动广播任务已停止")
+            print("[OK] auto broadcast task stopped")
     
     async def send_broadcast_danmaku(self, danmaku=None):
         global connected_clients
@@ -289,9 +302,9 @@ class DanmakuServerApp:
                     data = json.loads(message)
                     await self.receive(websocket, data)  # 👉 交给子类处理
                 except json.JSONDecodeError:
-                    print(f"⚠️ 非JSON消息: {message}")
+                    print(f"[!] 非JSON消息: {message}")
         except websockets.ConnectionClosed:
-            print("❌ 客户端断开连接")
+            print("[!] 客户端断开连接")
         finally:
             await self.unregister_client(websocket)
 
@@ -325,7 +338,7 @@ class DanmakuServerApp:
     
     async def main(self):
         async with websockets.serve(self.danmaku_server, "localhost", 8080):
-            print("✅ WebSocket 弹幕服务已启动 ws://localhost:8080")
+            print("[OK] WebSocket 弹幕服务已启动 ws://localhost:8080")
             await asyncio.Future()  # 保持服务器运行
 
 if __name__ == "__main__":
