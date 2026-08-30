@@ -6,18 +6,22 @@
         
         <title>Danmaku Server Test</title>
     </head>
-    <body></body>
+    <body>
+        <h2>Danmaku Simulator Test</h2>
+        <p>Connect to ws://localhost:8080</p>
+        <p>Expected message format: <code>{type, text, color, size, position, sender, senderId, is_special, blocked}</code></p>
+    </body>
     <script>
         const ws = new WebSocket("ws://localhost:8080");
 
         ws.onopen = () => {
             console.log("Connected to WebSocket server");
-            // Send a test message to the server
-            ws.send(JSON.stringify({ type: "test", content: "Hello, Server!" }));
         };
 
         ws.onmessage = (event) => {
-            console.log("Message from server:", event.data);
+            const data = JSON.parse(event.data);
+            const blockedTag = data.blocked ? ' [BLOCKED]' : '';
+            console.log(`[${data.type}] ${data.sender}: ${data.text}${blockedTag}`, data);
         };
 
         ws.onclose = () => {

@@ -29,7 +29,7 @@ var log = console.log
 let ws = null;
 let reconnectTimer = null;
 let path = "弹幕群名";
-let port = 5099;
+let port = 8000;
 const WS_URL_Head = "ws://localhost";
 let reconnectDelay = 3000; // 初始延迟 3 秒
 
@@ -420,10 +420,15 @@ function getAudienceRate(text) {
 }
 
 function audienceRate(danmaku) {
+    if (danmaku.sender in Players) return; // 玩家不能评分
+    if (danmaku.text.trim() === "0") { // 发送 0 取消投票
+        delete AudiencesRating[danmaku.sender];
+        updateAnswersScores();
+        return;
+    }
     var ar = getAudienceRate(danmaku.text);
     if (ar === null) return; // 无效评分
-    else if (danmaku.sender in Players) return; // 玩家不能评分
-    else AudiencesRating[danmaku.sender] = ar;
+    AudiencesRating[danmaku.sender] = ar;
     updateAnswersScores();
 }
 
@@ -790,4 +795,13 @@ function set_congratulations() {
 }
 
 /// 实际代码
+//
+// 消息格式说明：
+// ne-danmaku 后端发送的消息格式为：
+//   {type, text, color, size, position, sender, senderId, is_special, blocked, ...}
+// 游戏前端读取 data.sender 和 data.text 进行游戏逻辑处理。
+// 【重要】blocked 消息（黑名单/去重标记）仍会被游戏逻辑正常处理——
+//   后端保证不丢弃任何消息，原始文本完整保留，游戏指令不受影响。
+//   blocked 标记仅供弹幕展示层（DanmakuDisplay）使用。
+//
 connect();

@@ -51,7 +51,8 @@ class DanmakuServerApp:
         self.server_thread = None
         
         self.game_state = "Idle"
-        
+        self.blocked_var = tk.BooleanVar(value=False)
+
         self.create_widgets()
         
         # 启动异步事件循环的线程
@@ -86,6 +87,8 @@ class DanmakuServerApp:
         ttk.Button(self.control_frame, text="结束打分", command=lambda: self.admin_broadcast(GSControl["EndRating"])).pack(side=tk.LEFT, padx=5)
         ttk.Button(self.control_frame, text="下一回合", command=lambda: self.admin_broadcast(GSControl["NextRound"])).pack(side=tk.LEFT, padx=5)
         ttk.Button(self.control_frame, text="结束游戏", command=lambda: self.admin_broadcast(GSControl["EndGame"])).pack(side=tk.LEFT, padx=5)
+
+        ttk.Checkbutton(self.control_frame, text="blocked", variable=self.blocked_var).pack(side=tk.LEFT, padx=10)
         
         # 状态标签
         self.status_var = tk.StringVar(value="服务器未运行")
@@ -107,26 +110,34 @@ class DanmakuServerApp:
     def player_enroll(self):
         for i in range(random.randint(4, 10)):
             danmaku = {
+                "type": "plain",
                 "text": "1",
                 "color": "blue",
                 "size": 22,
+                "position": "scroll",
                 "sender": random.choice(players),
-                "is_broadcast": True
+                "senderId": None,
+                "is_special": False,
+                "blocked": False,
             }
             # 把发送任务丢给 asyncio loop
             asyncio.run_coroutine_threadsafe(
                 self.send_broadcast_danmaku(danmaku),
                 self.loop
             )
-    
+
     def player_answer(self):
         for p in players:
             danmaku = {
+                "type": "plain",
                 "text": random.choice(answers),
                 "color": "green",
                 "size": 22,
+                "position": "scroll",
                 "sender": p,
-                "is_broadcast": True
+                "senderId": None,
+                "is_special": False,
+                "blocked": False,
             }
             # 把发送任务丢给 asyncio loop
             asyncio.run_coroutine_threadsafe(
@@ -136,11 +147,15 @@ class DanmakuServerApp:
     
     def admin_broadcast(self, text = ""):
         danmaku = {
+            "type": "plain",
             "text": text,
             "color": "red",
             "size": 28,
+            "position": "scroll",
             "sender": admin,
-            "is_broadcast": True
+            "senderId": None,
+            "is_special": True,
+            "blocked": self.blocked_var.get(),
         }
         # 把发送任务丢给 asyncio loop
         asyncio.run_coroutine_threadsafe(
@@ -239,18 +254,22 @@ class DanmakuServerApp:
         global connected_clients
         if not connected_clients:
             return
-        
+
         if danmaku is None:
-            # 生成随机弹幕
+            # 生成随机弹幕（模拟真实后端 PlainDanmakuMessage 格式）
             danmaku = {
+                "type": "plain",
                 "text": random.choice(texts),
                 "color": random.choice(colors),
                 "size": random.choice([14, 18, 22, 28]),
+                "position": "scroll",
                 "sender": random.choice(users),
-                "is_broadcast": True  # 标记为管理员广播
+                "senderId": None,
+                "is_special": False,
+                "blocked": random.random() < 0.1,  # 10% 概率模拟 blocked
             }
             if self.game_state == "Rating":
-                danmaku["text"] = random.choice(['1', '2', '3', '4'])
+                danmaku["text"] = random.choice(['1', '2', '3', '4', '0'])
         
         # 发送给所有连接的客户端
         tasks = []
@@ -278,12 +297,19 @@ class DanmakuServerApp:
 
     async def receive(self, websocket, data):
         """
-        虚拟函数：处理接收到的消息
-        子类实现
+        处理接收到的消息。
+
+        支持两种格式：
+        - ne-danmaku 格式：{type: "plain"|"game_state_change", text, sender, ...}
+        - 旧扁平格式：{text, sender, ...}（自动补全 type="plain"）
         """
+        # 兼容旧格式
+        if "type" not in data:
+            data["type"] = "plain"
+
         if data.get("type") == "game_state_change":
             self.game_state = data.get("state", "Idle")
-            
+
             if self.game_state == "Enroll":
                 self.player_enroll()
             elif self.game_state == "Answering":
