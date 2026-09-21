@@ -21,6 +21,9 @@ const GSControl = Object.freeze({
     EndGame: "结束游戏", // 结束游戏
 });
 
+const ANSWER_SECONDS = 60; // 回答时限（秒）
+const RATING_SECONDS = 15; // 打分时限（秒）
+
 var data = null;
 
 var log = console.log
@@ -52,7 +55,9 @@ function connect() {
         log("⚠️ 路径不能为空，使用默认路径 " + path);
         pathInput.value = path;
     }
-    const WS_URL = WS_URL_Head + ":" + port + "/danmaku/" + encodeURIComponent(path);
+    // ne-danmaku 真实后端路径为 /api/danmaku/v1/danmaku/{群名}；
+    // 本地模拟器不校验路径，因此同一前缀两端通用
+    const WS_URL = WS_URL_Head + ":" + port + "/api/danmaku/v1/danmaku/" + encodeURIComponent(path);
 
     // 先清理旧连接
     disconnect();
@@ -128,10 +133,9 @@ function sendMessage(msg) {
 }
 
 // 前端逻辑
-const MaxPlayers = 4; // 最大玩家数
-
-// const characterImageHead = "https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/CharacterCards13/"
-const characterImageHead = "/image/"
+const MinPlayers = 4; // 最少玩家数
+const MaxPlayersLimit = 6; // 最大玩家数上限
+var MaxPlayers = 4; // 最大玩家数（控制面板可调 4~6）
 
 var Controller = "Admin"; // 控制者的昵称
 var Players = []; // 玩家昵称列表
@@ -143,8 +147,8 @@ var Answers4Rank = []; //用于排序的答案列表
 var AnswersScores = {}; // 玩家答案分数
 var GameState = GS.Idle; // 游戏状态
 var CurrentRound = 0; // 当前回合数
-var characters = allCharacters; // 角色列表
-var character = null; // 当前角色
+var questionPool = allQuestions.slice(); // 问题池（独立副本，池子耗尽自动补满）
+var question = null; // 当前问题
 
 var CountingDownInterval = null; // 倒计时定时器
 
@@ -157,8 +161,8 @@ function resetAudiencesRating() {
     AudiencesRating = {};
 }
 
-function resetCharacters() {
-    characters = allCharacters;
+function resetQuestions() {
+    questionPool = allQuestions.slice();
 }
 
 function resetAnswers() {
@@ -180,19 +184,31 @@ function getPlayers() {
     return getActivePlayerElements(".player_name").map(i => i.value).filter(i => i !== "");
 }
 
-function chooseCharacter() {
-    if (characters.length === 0) {
-        alert("角色已用尽，请重置角色");
-        return;
+function chooseQuestion() {
+    if (questionPool.length === 0) {
+        questionPool = allQuestions.slice(); // 池子耗尽自动补满
     }
-    var idx = Math.floor(Math.random() * characters.length);
-    character = characters[idx];
-    characters.splice(idx, 1); // 移除已选角色
-    return updateCharacterInDocument();
+    var idx = Math.floor(Math.random() * questionPool.length);
+    question = questionPool[idx];
+    questionPool.splice(idx, 1); // 移除已出题目
+    return updateQuestionInDocument();
 }
 
 function Enroll() {
     removePlayersInDocument();
+}
+
+function enrollPlayer(pname) {
+    // 报名：仅报名阶段、名字非空不重复、未满员
+    if (GameState !== GS.Enroll) return;
+    if (!pname) return;
+    if (getActivePlayerElements(".player_name").map(i => i.value).includes(pname)) {
+        return; // 已存在
+    }
+    if (getActivePlayerElements(".player_name").length >= MaxPlayers) {
+        return; // 超出最大玩家数
+    }
+    addPlayer(pname);
 }
 
 function StopAnswering() {
@@ -207,20 +223,14 @@ async function newGame() {
     rounds.innerText = CurrentRound;
     frozenPlayers();
     Players = getPlayers();
-    // 如果相同
-    if (new Set(Players).size !== Players.length) {
-        alert("玩家昵称不能相同");
-        unfrozenPlayers();
-        return;
-    }
     PlayersScores = Object.fromEntries(Players.map(i => [i, 0]))
     resetAnswers();
     resetAudiencesRating();
     hideAddPlayerButton();
     unfrozenAnswers();
-    resetCharacters();
-    await chooseCharacter();
-    await countingDown(60);
+    resetQuestions();
+    chooseQuestion();
+    await countingDown(ANSWER_SECONDS);
     StopAnswering();
 }
 
@@ -230,7 +240,7 @@ function endGame() {
     resetAudiencesRating();
     removeAnswersInDocument();
     showAddPlayerButton();
-    resetCharacters();
+    resetQuestions();
     set_congratulations();
     countingDown(0); // 停止计时
 }
@@ -247,8 +257,8 @@ async function nextRound() {
     resetAudiencesRating();
     removeAnswersInDocument();
     unfrozenAnswers();
-    await chooseCharacter();
-    await countingDown(60);
+    chooseQuestion();
+    await countingDown(ANSWER_SECONDS);
     StopAnswering();
 }
 
@@ -282,7 +292,7 @@ async function startRating() {
     AnswersScores = Object.fromEntries(Answers.map(i => [i, 0]));
     Answers4Rank = Answers.slice(); // 复制一份用于排序
     createAnswersInDocument();
-    await countingDown(15);
+    await countingDown(RATING_SECONDS);
     endRating();
 }
 
@@ -332,6 +342,16 @@ function processMessage(e) {
                 return;
             }
             data = JSON.parse(data);
+            // 适配 ne-danmaku：settings/control 等帧没有 sender（也可能为 null），不参与游戏逻辑
+            if (typeof data.sender !== "string" || data.sender === "") {
+                resolve();
+                return;
+            }
+            // 👑 是后端给"特殊弹幕"（管理端/上游发出）追加的展示标记，
+            // 游戏层剥掉尾部标记后再匹配控制词 / 报名 / 答题 / 投票
+            if (typeof data.text === "string") {
+                data.text = data.text.replace(/👑+$/, "");
+            }
             if (data.sender === Controller) {
                 if (data.text === GSControl.StartEnroll) {
                     if (GameState === GS.Idle) {
@@ -341,8 +361,15 @@ function processMessage(e) {
                 }
                 else if (data.text === GSControl.StartGame) {
                     if (GameState === GS.Enroll) {
-                        GameState = GS.Gaming.Answering;
-                        newGame();
+                        const names = getActivePlayerElements(".player_name").map(i => i.value);
+                        if (names.length < MinPlayers) {
+                            alert("至少需要 " + MinPlayers + " 名玩家才能开始游戏（当前 " + names.length + " 人）");
+                        } else if (new Set(names).size !== names.length) {
+                            alert("玩家昵称不能相同");
+                        } else {
+                            GameState = GS.Gaming.Answering;
+                            newGame();
+                        }
                     }
                 } else if (data.text === GSControl.StartRating) {
                     if (GS.isGaming(GameState)) {
@@ -366,6 +393,9 @@ function processMessage(e) {
                         GameState = GS.Idle;
                         endGame();
                     }
+                } else if (data.text === "1") {
+                    // 主持人本人也能扣 1 报名（主持人参赛 / 本地测试）
+                    enrollPlayer(data.sender);
                 }
                 gameStateChangeFeedback();
                 updateGameStateInDocument();
@@ -373,23 +403,9 @@ function processMessage(e) {
             } else {
                 if (GameState === GS.Gaming.Rating) {
                     audienceRate(data);
-                } else if (GameState === GS.Enroll) {
-                    // 报名阶段，允许添加玩家
-                    var pname = data.sender;
-                    if (data.text !== "1") { // 仅允许发送“1”报名
-                        resolve();
-                        return;
-                    }
-
-                    if (getActivePlayerElements(".player_name").map(i => i.value).includes(pname)) {
-                        resolve();
-                        return; // 已存在
-                    }
-                    if (getActivePlayerElements(".player_name").length >= MaxPlayers) {
-                        resolve();
-                        return; // 超出最大玩家数
-                    }
-                    addPlayer(pname);
+                } else if (GameState === GS.Enroll && data.text === "1") {
+                    // 报名阶段，仅允许发送“1”报名
+                    enrollPlayer(data.sender);
                 } else if (GameState === GS.Gaming.Answering) {
                     playerAnswer(data);
                 }
@@ -459,6 +475,38 @@ function fixTextWidth(e, offset = 28.0 / 8) {
     }
 }
 
+function changeMaxPlayers(delta) {
+    var newMax = Math.min(Math.max(MaxPlayers + delta, MinPlayers), MaxPlayersLimit);
+    if (newMax === MaxPlayers) return;
+    var count = getActivePlayerElements(".player_name").length;
+    if (newMax < count) {
+        alert("当前已有 " + count + " 名玩家，无法降低到 " + newMax + "，请先删除多余玩家");
+        return;
+    }
+    MaxPlayers = newMax;
+    const show = document.getElementById("max_players_show");
+    if (show) show.innerText = MaxPlayers;
+    if (count < MaxPlayers) showAddPlayerButton(); // 提高上限时重新显示“添加玩家”按钮
+}
+
+function setControllerNickname() {
+    const input = document.getElementById("controller_nickname_input");
+    if (input && input.value) {
+        Controller = input.value.trim();
+    }
+}
+
+function updatePlayersWrapClass() {
+    // 5 人及以上时玩家区切换为 3 列布局（CSS .players_six）
+    const six = getActivePlayerElements(".player_name").length >= 5;
+    const wrap = document.querySelector(".players_wrap_wrap");
+    if (wrap) {
+        wrap.classList.toggle("players_six", six);
+    }
+    // body 级标记：6 人报名时气泡改悬浮屏中央，避开玩家区
+    document.body.classList.toggle("players_six", six);
+}
+
 function addPlayer(name = "") {
     // temp
 
@@ -517,10 +565,12 @@ function addPlayer(name = "") {
     if (getActivePlayerElements(".player_name").length >= MaxPlayers) {
         hideAddPlayerButton();
     }
+    updatePlayersWrapClass();
 }
 
 function deletePlayer(e) {
     e.remove();
+    updatePlayersWrapClass();
     if (getActivePlayerElements(".player_name").length < MaxPlayers) {
         showAddPlayerButton();
     }
@@ -581,7 +631,7 @@ function showAddPlayerButton() {
 }
 
 function createAnswersInDocument() {
-    const colors = ["#EF65C8", "#57DF0E", "#f07f1f", "#6efdfd"];
+    const colors = ["#EF65C8", "#57DF0E", "#f07f1f", "#6efdfd", "#FFE44D", "#B967FF"];
 
     const answersWrap = document.getElementById("answers_wrap");
     answersWrap.innerHTML = ""; // 清空
@@ -715,33 +765,15 @@ function updateGameStateInDocument() {
     mainContent.classList.add("state_" + targetGameStateClass);
 }
 
-function updateCharacterInDocument() {
-    return new Promise((resolve, reject) => {
-        const characterElement = document.getElementById("character");
-        const instructionsElement = Array.from(document.getElementsByClassName("answer_guide"));
-        const characterName = document.getElementById("character_name");
-        //"url(" + characterImageHead + hand + ".png)"
-        if (character !== null) {
-            characterName.innerText = character;
-            characterElement.src = characterImageHead + character + ".png";
-            // 等加载完成再设置opacity
-            characterElement.onload = () => {
-                instructionsElement.forEach(e => {e.style.opacity = 1;})
-                characterElement.style.opacity = 1;
-                resolve();
-            };
-        } else {
-            characterName.innerText = "棍木";
-            characterElement.src = "";
-            characterElement.style.opacity = 0;
-            resolve();
-        }
-    })
+function updateQuestionInDocument() {
+    const questionElement = document.getElementById("question");
+    questionElement.innerText = (question !== null) ? question : "";
 }
 
 function removePlayersInDocument() {
     const playersWrap = document.getElementById("players_wrap");
     playersWrap.innerHTML = ""; // 清空
+    updatePlayersWrapClass();
 }
 
 function countingDown(seconds = 30) {

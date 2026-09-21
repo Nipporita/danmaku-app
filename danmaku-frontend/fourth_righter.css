@@ -36,17 +36,6 @@ by 润植家
     }
 }
 
-@keyframes backgroundWiggle {
-    0% {
-        filter: blur(0px);
-        opacity: 1;
-    }
-    100% {
-        filter: blur(150px);
-        opacity: 0.6;
-    }
-}
-
 
 #main_content{
     height: calc(100vh - 20rem / 16 - 0.667px - var(--bottom-offset));
@@ -254,21 +243,6 @@ input.player_answer {
     position: relative;
 }
 
-#container::before {
-    content: "";
-    display: block;
-    position: absolute;
-    background-image: linear-gradient(
-90deg, #EF65C8 0% calc(25% - var(--softness)), #57DF0E calc(25% + var(--softness)) calc(50% - var(--softness)), #f07f1f calc(50% + var(--softness)) calc(75% - var(--softness)), #6efdfd calc(75% + var(--softness)) 100%);
-    width: 100%;
-    height: 200vh;
-    top: -50vh;
-    mix-blend-mode: color;
-    pointer-events: none;
-    --softness: 2%;
-    animation: backgroundWiggle 3s infinite alternate;
-}
-
 #container::after {
     content: "";
     display: block;
@@ -313,6 +287,12 @@ span.player_score {
 #players_wrap .player_content:nth-of-type(4) .player_progress {
     background-color: #6efdfd;
 }
+#players_wrap .player_content:nth-of-type(5) .player_progress {
+    background-color: #FFE44D;
+}
+#players_wrap .player_content:nth-of-type(6) .player_progress {
+    background-color: #B967FF;
+}
 
 div#container {
     height: 100vh;
@@ -351,7 +331,9 @@ div#container {
 }
 
 .state_rating .game_state_wrap_wrap,
-.state_gaming_idle .game_state_wrap_wrap {
+.state_gaming_idle .game_state_wrap_wrap,
+.state_answering .game_state_wrap_wrap,
+.state_stopanswering .game_state_wrap_wrap {
     flex-grow: 0.1;
 }
 
@@ -388,7 +370,7 @@ div#container {
     position: relative;
     overflow: hidden;
     background: white;
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 1.8vw, 2.5rem);
     display: flex;
     font-family: 'AaGothic';
     flex-direction: row;
@@ -424,12 +406,46 @@ div#container {
     border-radius: 11.5px;
 }
 
-img#character {
-    aspect-ratio: 2/3;
-    height: 100%;
-    border-radius: calc(25rem / 16);
-    opacity: 0;
+.question_box {
+    position: relative; /* 需要相对定位，否则 ::before 内边框定位错乱 */
+    width: min(48rem, 70%);
+    max-height: 100%;
+    overflow: hidden;
+    background: white;
+    border: calc(3.5rem / 16) solid black;
+    box-sizing: border-box;
+    border-radius: calc(22rem / 16);
+    font-size: clamp(2.5rem, 3vw, 5rem);
+    font-family: 'JinLing', Arial;
+    font-weight: bold;
+    line-height: 1.35;
+    text-align: center;
+    padding: 1.5rem 2rem;
     box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
+    overflow-wrap: break-word;
+    opacity: 0;
+    transition: opacity 2s;
+}
+
+.question_box::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border: calc(1.5rem / 16) solid black;
+    left: var(--distance);
+    top: var(--distance);
+    right: var(--distance);
+    bottom: var(--distance);
+    --distance: calc(2.3rem / 16);
+    border-radius: calc(22rem / 16 - 1.5rem / 16 - var(--distance));
+}
+
+.state_answering .question_box, .state_stopanswering .question_box {
+    opacity: 1;
+}
+
+.state_idle .question_box {
+    opacity: 0;
 }
 
 input.player_answer::placeholder {
@@ -529,14 +545,6 @@ button#connect_button {
 
 .state_answering .character_wrap, .state_stopanswering .character_wrap {
     flex-grow: 1;
-}
-
-.state_idle img#character {
-    opacity: 0;
-}
-
-.state_answering img#character {
-    transition: opacity 2s;
 }
 
 .rule_wrap, .button_wrap {
@@ -715,11 +723,11 @@ button.next-button, button.prev-button {
 }
 
 .answer_guide_1 {
-    right: calc(-0.5 * var(--width) + 10px);
+    right: calc(-0.75 * var(--width) + 10px);
 }
 
 .answer_guide_2 {
-    left: calc(-0.5 * var(--width) + 10px);
+    left: calc(-0.75 * var(--width) + 10px);
 }
 
 .state_answering .answer_guide, .state_stopanswering .answer_guide {
@@ -801,6 +809,44 @@ button.next-button, button.prev-button {
     font-size: 1rem;
 }
 
+/* 控制面板自定义行：整体与四字按钮同宽，避免撑爆面板 */
+.max_players_wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(4em + 21rem / 16);
+    box-sizing: border-box;
+}
+
+.max_players_wrap button {
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0 0.2em;
+    border-width: calc(1.5rem / 16); /* 比普通按钮细，容纳单字符 */
+}
+
+#max_players_show {
+    font-size: 1.1rem;
+    line-height: 1;
+    min-width: 2ch;
+    text-align: center;
+}
+
+#controller_nickname_input {
+    width: calc(4em + 21rem / 16);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0.15rem 0.4rem;
+    text-align: center;
+    font-size: 1rem;
+    color: black;
+    background: white;
+    border: calc(1.5rem / 16) solid black;
+    border-radius: 0.5rem;
+}
+
 p {
     margin-block: 0.5em;
 }
@@ -872,4 +918,127 @@ html {
 .answer_wrap.bigger {
     transform: scale(1.02);
     transition: top 0.5s;
+}
+
+/* ===== 响应式适配 =====
+   主基准：16:3 超宽屏（如 5760×1080）
+   兜底：1920×1080 常规屏 */
+
+@media (min-width: 3600px) {
+    /* 超宽屏（晚会主屏 3904×672，16:3 屏 5760×1080）：
+       5 人以上（.players_six，由 JS 按人数切换）玩家区锁宽为 40vw，排 3 列 × 2 行；
+       4 人及以下保持默认 24vw 两列布局 */
+    .players_wrap_wrap.players_six {
+        width: 40vw;
+        flex-grow: 0; /* 锁死宽度，剩余空间留给问题区；否则 grow 会把行撑到能塞 4 张卡 */
+        margin-left: auto; /* 贴右，避免挡住中央面板右侧外挂的 enroll_guide 气泡 */
+        transition: none; /* 4→5 人切换时 grow 变化不再做 2s 渐变，消除"一行 4 人"暂态 */
+    }
+    .players_wrap_wrap.players_six div#players_wrap {
+        width: 100%;
+    }
+}
+
+@media (max-width: 2200px) {
+    /* 常规屏（1080p）下玩家区与问题区空间紧张，外挂引导气泡会压到
+       玩家卡和问题盒，直接隐藏（16:3 超宽屏为主基准时不受影响） */
+    .state_answering .answer_guide_1, .state_stopanswering .answer_guide_1,
+    .state_answering .answer_guide_2, .state_stopanswering .answer_guide_2 {
+        display: none;
+    }
+    /* 问题盒加宽、字号调小，避免 1080p 下挤成竖条 */
+    .question_box {
+        width: min(48rem, 92%);
+        font-size: clamp(2rem, 2.5vw, 3rem);
+    }
+    /* 5~6 人时玩家区放宽为 3 列（.players_six 由 JS 按人数切换） */
+    .players_wrap_wrap.players_six {
+        width: 38vw;
+        flex-grow: 0;
+        margin-left: auto; /* 贴右，避免挡住中央面板右侧外挂的 enroll_guide 气泡 */
+        transition: none; /* 4→5 人切换时 grow 变化不再做 2s 渐变，消除"一行 4 人"暂态 */
+    }
+    .players_wrap_wrap.players_six div#players_wrap {
+        width: 100%;
+    }
+}
+/* ============================================================
+   v2 整体布局：Grid 单元格制（覆盖上面的旧 flex 布局）
+   四列：[控制栏 auto][面板 auto][主区 1fr][玩家区 列宽]
+   各区占用独立单元格，互不重叠；
+   主区内容按状态轮换：报名=气泡 / 答题=问题盒 / 打分=答案条。
+   ============================================================ */
+#main_content {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas: "ctrl panel main players";
+}
+
+#control_panel { grid-area: ctrl; }
+.game_state_wrap_wrap { grid-area: panel; }
+.character_wrap { grid-area: main; }
+.players_wrap_wrap { grid-area: players; }
+.answers_wrap_wrap { grid-area: main; }
+
+/* 各区清掉旧的 flex-grow / 固定 vw 宽 / margin 漂移，宽度只由所在列决定 */
+.game_state_wrap_wrap { width: auto; margin: 0; flex-grow: 0; }
+.character_wrap { width: auto; margin: 0; flex-grow: 0; }
+.players_wrap_wrap { margin: 0; flex-grow: 0; }
+.answers_wrap_wrap { width: auto; margin: 0; flex-grow: 0; display: none; }
+
+/* 报名/待机：主区保持可见（旧规则曾把它 opacity:0、宽度收成 0） */
+.state_idle .character_wrap,
+.state_enroll .character_wrap {
+    opacity: 1;
+    width: auto;
+    flex-grow: 0;
+    overflow: visible;
+}
+
+/* 打分/回合间歇：答案条占主区，问题盒让位（互斥，永不重叠） */
+.state_rating .character_wrap,
+.state_gaming_idle .character_wrap {
+    display: none;
+}
+.state_rating .answers_wrap_wrap,
+.state_gaming_idle .answers_wrap_wrap {
+    display: block;
+}
+
+/* 报名气泡：从"面板外挂"改为主区正中央（不再与任何邻居重叠） */
+.character_wrap .enroll_guide {
+    inset: 0;
+    margin: auto;
+    pointer-events: none;
+}
+
+/* 答题/打分/间歇态玩家区固定 24vw（两列）；
+   6 人 3 列的宽玩家区只属于报名展示，答题/打分时让位给主区 */
+.state_answering .players_wrap_wrap,
+.state_stopanswering .players_wrap_wrap,
+.state_rating .players_wrap_wrap,
+.state_gaming_idle .players_wrap_wrap {
+    width: 24vw;
+}
+
+/* 玩家区内部：Grid auto-fill —— 列数由容器宽度自动推导，
+   行高自动均分（2 列或 3 列、2 行或 3 行都无需手写） */
+div#players_wrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10.5vw, 1fr));
+    grid-auto-rows: 1fr;
+    column-gap: 0.4rem;
+    row-gap: 0.6rem;
+    padding: 0.5rem 0.2rem;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.player_content {
+    height: auto;
+}
+
+.player.fantasy_guide_div_1 {
+    width: 100%;
+    box-sizing: border-box;
 }

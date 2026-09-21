@@ -108,14 +108,14 @@ class DanmakuServerApp:
         self.connections_label.pack(pady=10)
     
     def player_enroll(self):
-        for i in range(random.randint(4, 10)):
+        for i in range(random.randint(4, 6)):
             danmaku = {
                 "type": "plain",
                 "text": "1",
                 "color": "blue",
                 "size": 22,
                 "position": "scroll",
-                "sender": random.choice(players),
+                "sender": random.choice(players[:6]),
                 "senderId": None,
                 "is_special": False,
                 "blocked": False,
@@ -127,7 +127,7 @@ class DanmakuServerApp:
             )
 
     def player_answer(self):
-        for p in players:
+        for p in players[:6]:
             danmaku = {
                 "type": "plain",
                 "text": random.choice(answers),
@@ -282,7 +282,7 @@ class DanmakuServerApp:
                 "blocked": random.random() < 0.1,  # 10% 概率模拟 blocked
             }
             if self.game_state == "Rating":
-                danmaku["text"] = random.choice(['1', '2', '3', '4', '0'])
+                danmaku["text"] = random.choice(['1', '2', '3', '4', '5', '6', '0'])
         
         # 发送给所有连接的客户端
         tasks = []
