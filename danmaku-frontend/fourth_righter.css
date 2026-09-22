@@ -370,7 +370,7 @@ div#container {
     position: relative;
     overflow: hidden;
     background: white;
-    font-size: clamp(1.5rem, 1.8vw, 2.5rem);
+    font-size: clamp(1.3rem, 1.5vw, 2.2rem); /* 答案字号（较原值下调一档） */
     display: flex;
     font-family: 'AaGothic';
     flex-direction: row;
@@ -408,14 +408,14 @@ div#container {
 
 .question_box {
     position: relative; /* 需要相对定位，否则 ::before 内边框定位错乱 */
-    width: min(48rem, 70%);
+    width: min(48rem, 80%);
     max-height: 100%;
     overflow: hidden;
     background: white;
     border: calc(3.5rem / 16) solid black;
     box-sizing: border-box;
     border-radius: calc(22rem / 16);
-    font-size: clamp(2.5rem, 3vw, 5rem);
+    font-size: clamp(2.25rem, 2.6vw, 4.5rem);
     font-family: 'JinLing', Arial;
     font-weight: bold;
     line-height: 1.35;
@@ -492,7 +492,7 @@ input.player_answer::placeholder {
 }
 
 .answer_content, .answer_score {
-    transition: opacity 1s 1s;
+    /* 浮现动画统一由整条 .answer_wrap 承担，这里不再单独做 opacity 过渡（避免双重淡入） */
     opacity: 0;
     text-shadow: 0 0 1px rgba(0,0,0,0.8);
 }
@@ -500,6 +500,11 @@ input.player_answer::placeholder {
 .state_rating .answer_content, .state_rating .answer_score,
 .state_gaming_idle .answer_content, .state_gaming_idle .answer_score {
     opacity: 1;
+}
+
+/* 浮现动画作用在整条（框+文字一起淡入），而不是框先出现、文字后浮现 */
+.state_rating .answer_wrap,
+.state_gaming_idle .answer_wrap {
     animation: FadeIn 2s;
 }
 
@@ -723,11 +728,11 @@ button.next-button, button.prev-button {
 }
 
 .answer_guide_1 {
-    right: calc(-0.75 * var(--width) + 10px);
+    right: calc(-0.5 * var(--width) + 10px);
 }
 
 .answer_guide_2 {
-    left: calc(-0.75 * var(--width) + 10px);
+    left: calc(-0.5 * var(--width) + 10px);
 }
 
 .state_answering .answer_guide, .state_stopanswering .answer_guide {
@@ -739,11 +744,11 @@ button.next-button, button.prev-button {
 }
 
 #port_input {
-    width: 2.5rem;
+    width: 2.2rem;
 }
 
 #path_input {
-    width: 13rem;
+    width: 7rem; /* 连接行新增"玩家数"控件后相应缩短，控制整行宽度 */
 }
 
 .enroll_guide {
@@ -809,29 +814,37 @@ button.next-button, button.prev-button {
     font-size: 1rem;
 }
 
-/* 控制面板自定义行：整体与四字按钮同宽，避免撑爆面板 */
+/* 玩家数控件（位于面板的"端口 / 群名 / 连接"行内） */
 .max_players_wrap {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    width: calc(4em + 21rem / 16);
-    box-sizing: border-box;
+    gap: 0.25rem;
+    margin-right: 0.4rem; /* 与后面的"|"分隔符留间距 */
 }
 
 .max_players_wrap button {
     width: auto;
     min-width: 0;
     margin: 0;
-    padding: 0 0.2em;
-    border-width: calc(1.5rem / 16); /* 比普通按钮细，容纳单字符 */
+    padding: 0 0.3em;
+    font-size: 1rem;
+    line-height: 1.4;
+    background: transparent;
+    border: none; /* 去掉外边框，连接行内更清爽 */
 }
 
 #max_players_show {
-    font-size: 1.1rem;
+    font-size: 1rem;
     line-height: 1;
-    min-width: 2ch;
+    min-width: 1.5ch;
     text-align: center;
+}
+
+.max_players_label {
+    font-size: 1rem;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 #controller_nickname_input {
@@ -930,9 +943,7 @@ html {
        4 人及以下保持默认 24vw 两列布局 */
     .players_wrap_wrap.players_six {
         width: 40vw;
-        flex-grow: 0; /* 锁死宽度，剩余空间留给问题区；否则 grow 会把行撑到能塞 4 张卡 */
-        margin-left: auto; /* 贴右，避免挡住中央面板右侧外挂的 enroll_guide 气泡 */
-        transition: none; /* 4→5 人切换时 grow 变化不再做 2s 渐变，消除"一行 4 人"暂态 */
+        flex-grow: 0; /* 锁死宽度，剩余空间留给问题区 */
     }
     .players_wrap_wrap.players_six div#players_wrap {
         width: 100%;
@@ -955,8 +966,14 @@ html {
     .players_wrap_wrap.players_six {
         width: 38vw;
         flex-grow: 0;
-        margin-left: auto; /* 贴右，避免挡住中央面板右侧外挂的 enroll_guide 气泡 */
-        transition: none; /* 4→5 人切换时 grow 变化不再做 2s 渐变，消除"一行 4 人"暂态 */
+    }
+    /* 1080p 空间紧张：游戏进行中玩家区收起为 2 列，否则 3 列玩家区
+       会把中央问题盒挤到无法显示（主屏 ≥3600 不受此限制，保持铺开） */
+    .state_answering .players_wrap_wrap,
+    .state_stopanswering .players_wrap_wrap,
+    .state_rating .players_wrap_wrap,
+    .state_gaming_idle .players_wrap_wrap {
+        width: 24vw;
     }
     .players_wrap_wrap.players_six div#players_wrap {
         width: 100%;
@@ -970,21 +987,50 @@ html {
    ============================================================ */
 #main_content {
     display: grid;
+    /* 四列：[控制栏][面板][主区][玩家区]
+       两侧留白不用空列，而是在面板/玩家区上用 margin 表达：
+       列定义里含 auto 轨道（内容驱动）时 grid-template-columns 无法插值，
+       过渡不了；margin 是原生可过渡属性，vw 单位也能随屏宽自适应 */
     grid-template-columns: auto auto minmax(0, 1fr) auto;
     grid-template-areas: "ctrl panel main players";
+    /* 行高锁定为容器高度：否则会被控制面板的按钮列（最长的一列）撑长，
+       连带所有 height:100% 的区域一起变高 */
+    grid-template-rows: minmax(0, 1fr);
 }
 
-#control_panel { grid-area: ctrl; }
+#control_panel {
+    grid-area: ctrl;
+    min-height: 0; /* 内容超出时压缩自身，不参与决定行高 */
+}
 .game_state_wrap_wrap { grid-area: panel; }
 .character_wrap { grid-area: main; }
 .players_wrap_wrap { grid-area: players; }
 .answers_wrap_wrap { grid-area: main; }
 
 /* 各区清掉旧的 flex-grow / 固定 vw 宽 / margin 漂移，宽度只由所在列决定 */
-.game_state_wrap_wrap { width: auto; margin: 0; flex-grow: 0; }
+.game_state_wrap_wrap {
+    width: auto;
+    flex-grow: 0;
+    margin: 0 0 0 8vw; /* 左侧留白：面板不贴左缘，外挂按钮不出屏 */
+    transition: margin 0.6s ease;
+}
 .character_wrap { width: auto; margin: 0; flex-grow: 0; }
-.players_wrap_wrap { margin: 0; flex-grow: 0; }
-.answers_wrap_wrap { width: auto; margin: 0; flex-grow: 0; display: none; }
+.players_wrap_wrap {
+    margin: 0 8vw 0 0; /* 右侧留白：玩家区不贴右缘，视觉平衡 */
+    flex-grow: 0;
+    transition: margin 0.6s ease;
+}
+.answers_wrap_wrap {
+    width: auto;
+    margin: 0 3vw; /* 打分态答案条与左右邻居（面板/玩家区）保持间距 */
+    flex-grow: 0;
+    display: none;
+}
+
+/* 答案条数 ≥5 时行高变矮，缩小字号避免溢出（.many_answers 由 JS 标记） */
+#answers_wrap.many_answers .answer {
+    font-size: clamp(1rem, 1.2vw, 1.6rem);
+}
 
 /* 报名/待机：主区保持可见（旧规则曾把它 opacity:0、宽度收成 0） */
 .state_idle .character_wrap,
@@ -995,50 +1041,111 @@ html {
     overflow: visible;
 }
 
-/* 打分/回合间歇：答案条占主区，问题盒让位（互斥，永不重叠） */
+/* 打分/回合间歇：答案条占主区，问题盒淡出让位（互斥，永不重叠）；
+   display 走离散过渡（allow-discrete），淡出完成后才隐藏，避免硬切 */
 .state_rating .character_wrap,
 .state_gaming_idle .character_wrap {
     display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease, display 0.5s allow-discrete;
 }
 .state_rating .answers_wrap_wrap,
 .state_gaming_idle .answers_wrap_wrap {
     display: block;
 }
 
-/* 报名气泡：从"面板外挂"改为主区正中央（不再与任何邻居重叠） */
+/* 报名气泡：从"面板外挂"改为主区正中央（不再与任何邻居重叠）。
+   用 top/left 50% + transform 居中，高度收缩到内容
+   （若用 inset:0 + margin:auto，高度 auto 会被拉伸顶满上下边） */
 .character_wrap .enroll_guide {
-    inset: 0;
-    margin: auto;
+    inset: auto; /* 清掉旧的右侧外挂定位 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     pointer-events: none;
 }
 
-/* 答题/打分/间歇态玩家区固定 24vw（两列）；
-   6 人 3 列的宽玩家区只属于报名展示，答题/打分时让位给主区 */
+/* 游戏进行中（答题/打分/间歇）：左右留白收窄到 2vw（保留少量呼吸感，
+   也保证面板左外侧挂的按钮仍在屏内），空间大头让给主区和玩家区；
+   margin 过渡原生支持，切换时平滑收放 */
+.state_answering .game_state_wrap_wrap,
+.state_stopanswering .game_state_wrap_wrap,
+.state_rating .game_state_wrap_wrap,
+.state_gaming_idle .game_state_wrap_wrap {
+    margin-left: 3vw;
+}
 .state_answering .players_wrap_wrap,
 .state_stopanswering .players_wrap_wrap,
 .state_rating .players_wrap_wrap,
 .state_gaming_idle .players_wrap_wrap {
-    width: 24vw;
+    margin-right: 3vw;
+}
+
+/* 5 人以上（.players_six）时引导气泡收起：3 列玩家区占满右侧后，
+   外挂气泡没有容身空间，会压到玩家卡上 */
+body.players_six .answer_guide_1,
+body.players_six .answer_guide_2 {
+    display: none;
+}
+
+/* 打分列表：答案条用虚线边框；首条的"本轮问题"保持实线以作区分。
+   问题条与答案同字号、单行显示，过长由 JS 复用 fixTextWidth 横向压缩 */
+#answers_wrap .answer_wrap:not(.question_row) .answer {
+    border-style: dashed;
+}
+#answers_wrap .question_row .answer_content {
+    white-space: nowrap;
+}
+/* 问题条不参与投票：隐藏进度条（它有 min-width:100px，不隐藏会永久显示一截黄条） */
+#answers_wrap .question_row .answer_progress {
+    display: none;
+}
+
+/* 规则介绍标题：降为 h2 并压缩字号/边距，避免占满整页 */
+.instruction h2 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin: 0.3em 0 0.2em;
+}
+
+/* 开始游戏后（答题/打分/间歇）"规则介绍"按钮淡出缩小消失（控制面板按钮保留） */
+.rule_wrap {
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.state_answering .rule_wrap,
+.state_stopanswering .rule_wrap,
+.state_rating .rule_wrap,
+.state_gaming_idle .rule_wrap {
+    opacity: 0;
+    transform: scale(0.78); /* 原 scale(1.3) 基础上缩小到 0.6 倍，过渡平滑 */
+    pointer-events: none;
 }
 
 /* 玩家区内部：Grid auto-fill —— 列数由容器宽度自动推导，
    行高自动均分（2 列或 3 列、2 行或 3 行都无需手写） */
 div#players_wrap {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(10.5vw, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(10vw, 1fr));
     grid-auto-rows: 1fr;
-    column-gap: 0.4rem;
-    row-gap: 0.6rem;
-    padding: 0.5rem 0.2rem;
+    /* gap = 2 × border-image-outset(14px) 再收紧 2px：
+       相邻卡片的花纹边框轻微交叠 1px/侧，吸收 1fr 列宽取整的亚像素误差，
+       避免相切处露出 1px 残缝 */
+    gap: calc(14rem / 16 - 2px);
+    padding: 0.6rem 0.5rem;
     height: 100%;
     box-sizing: border-box;
 }
 
 .player_content {
     height: auto;
+    min-width: 0;
 }
 
-.player.fantasy_guide_div_1 {
+/* 卡片撑满网格单元：模板 .fantasy_guide_div_1 自带 14px 外边距，
+   会让卡片溢出格子（"几个 px 的间距"也来自它），这里一并归零 */
+.players_wrap_wrap .player.fantasy_guide_div_1 {
     width: 100%;
+    height: 100%;
     box-sizing: border-box;
+    margin: 0;
 }

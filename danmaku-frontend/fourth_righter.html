@@ -14,11 +14,6 @@
         <div id="main_content" class="state_idle">
             <div id="control_panel" class="control_wrap">
                 <button id="add_player_btn" onclick="addPlayer()">添加玩家</button>
-                <div class="max_players_wrap">
-                    <button onclick="changeMaxPlayers(-1)">−</button>
-                    <span id="max_players_show">4</span>
-                    <button onclick="changeMaxPlayers(1)">+</button>
-                </div>
                 <input type="text" id="controller_nickname_input" value="Admin" oninput="setControllerNickname()">
                 <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartEnroll})})">开始报名</button>
                 <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartGame})})">开始游戏</button>
@@ -26,7 +21,7 @@
                 <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.EndRating})})">结束打分</button>
                 <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.NextRound})})">下一回合</button>
                 <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.EndGame})})">结束游戏</button>
-                <button onclick="testSend()">测试弹幕</button>
+                <button onclick="toggleTestSend(this)">测试弹幕</button>
             </div>
             <div class="game_state_wrap_wrap">
                 <div class="game_state_wrap">
@@ -38,9 +33,16 @@
                             <div class="round_wrap">第<span id="rounds">0</span>回合</div>
                         </div>
                         <div class="port_info">
-                            <input type="text" id="port_input" placeholder="端口号" value="8000">
+                            <div class="max_players_wrap">
+                                <button onclick="changeMaxPlayers(-1)">−</button>
+                                <span id="max_players_show">6</span>
+                                <span class="max_players_label">人</span>
+                                <button onclick="changeMaxPlayers(1)">+</button>
+                            </div>
+                            |
+                            <input type="text" id="port_input" placeholder="端口号" value="8000" oninput="updateConnectButtonHint()">
                             /
-                            <input type="text" id="path_input" placeholder="群名" value="弹幕群名">
+                            <input type="text" id="path_input" placeholder="群名" value="弹幕群" oninput="updateConnectButtonHint()">
                             <button id="connect_button" onclick="connect();">连接</button>
                         </div>
                     </div>
@@ -70,7 +72,7 @@
                     <button class="close_instruction_button" onclick="close_instruction()"></button>
                     <div class="fantasy_guide_div_1 instruction">
                         <div>
-                            <h1>游戏玩法</h1>
+                            <h2>游戏玩法</h2>
                             <hr>
                             <p><b>基本玩法：</b>每回合大屏幕随机展示一个<b>主观问题</b>，选手自由作答，没有标准答案，由观众进行完全主观的打分：</p>
                             <ul>
@@ -82,7 +84,7 @@
                     </div>
                     <div class="fantasy_guide_div_1 instruction">
                         <div>
-                            <h1>游戏流程——报名环节</h1>
+                            <h2>游戏流程——报名环节</h2>
                             <hr>
                             <p>游戏开始前，由主持人在弹幕群里说<span>“开始报名”</span>后，大家在弹幕群内扣1报名，报名结果同步在大屏幕上。</p>
                             <p>凑齐4名选手后（人数可在控制面板调为4~6人），游戏开始。</p>
@@ -90,7 +92,7 @@
                     </div>
                     <div class="fantasy_guide_div_1 instruction">
                         <div>
-                            <h1>游戏流程——回答环节</h1>
+                            <h2>游戏流程——回答环节</h2>
                             <hr>
                             <p>游戏开始后，大屏幕随机展示一个主观问题，在时限内，选手要在弹幕群里自由回答。</p>
                             <p><b>注意：回答在弹幕群里进行，在回答环节请观众不要在弹幕群里说话。</b></p>
@@ -98,11 +100,12 @@
                     </div>
                     <div class="fantasy_guide_div_1 instruction">
                         <div>
-                            <h1>游戏流程——评分环节</h1>
+                            <h2>游戏流程——评分环节</h2>
                             <hr>
                             <p>回答结束后，主持人在弹幕群里说<span>“开始打分”</span>后，由在座的各位观众在弹幕群里发送<b>答案对应的数字</b>进行打分。</p>
                             <p><b>完全主观评分：</b>没有标准答案，觉得哪个答案最有节目效果就投哪个。</p>
                             <p>可以更改打分，取最后的一票。发送 <b>0</b> 可取消自己的投票。</p>
+                            <p>若多位选手给出了<b>相同的答案</b>，该答案获得的票数由他们<b>平均分配</b>。</p>
                         </div>
                     </div>
                 </div>
@@ -141,17 +144,27 @@
         ];
         var testSenders = ["Alice", "Bob", "Charlie", "Dave", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy", "Kevin", "Laura", "Mallory", "Niaj", "Olivia", "Peggy", "Quentin", "Rupert", "Sybil", "Trent", "Uma", "Victor", "Wendy", "Xander", "Yvonne", "Zack"];
         
-        var testSendCount = 0;
-        function testSend() {
-            testSendCount = 100;
-            function _testSend_next() {
-                if (testSendCount > 0) {
-                    _testSend();
-                    testSendCount--;
-                    setTimeout(_testSend_next, Math.random() * 500);
-                }
+        var testSending = false;
+        var testSendTimer = null;
+
+        // 开关式测试弹幕：点击持续发送，再点关闭
+        function toggleTestSend(btn) {
+            if (testSending) {
+                testSending = false;
+                clearTimeout(testSendTimer);
+                testSendTimer = null;
+                if (btn) btn.innerText = "测试弹幕";
+            } else {
+                testSending = true;
+                if (btn) btn.innerText = "关闭弹幕";
+                _testSend_next();
             }
-            _testSend_next();
+        }
+
+        function _testSend_next() {
+            if (!testSending) return;
+            _testSend();
+            testSendTimer = setTimeout(_testSend_next, Math.random() * 500);
         }
 
         function _testSend() {

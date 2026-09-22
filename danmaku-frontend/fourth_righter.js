@@ -21,8 +21,8 @@ const GSControl = Object.freeze({
     EndGame: "结束游戏", // 结束游戏
 });
 
-const ANSWER_SECONDS = 60; // 回答时限（秒）
-const RATING_SECONDS = 15; // 打分时限（秒）
+const ANSWER_SECONDS = 40; // 回答时限（秒）
+const RATING_SECONDS = 20; // 打分时限（秒）
 
 var data = null;
 
@@ -31,7 +31,7 @@ var log = console.log
 ///// WS 部分
 let ws = null;
 let reconnectTimer = null;
-let path = "弹幕群名";
+let path = "弹幕群";
 let port = 8000;
 const WS_URL_Head = "ws://localhost";
 let reconnectDelay = 3000; // 初始延迟 3 秒
@@ -87,6 +87,27 @@ function connect() {
         log("⚠️ 出错: " + err.message);
         // 不直接 close，等待 onclose 处理
     };
+
+    updateConnectButtonHint();
+}
+
+let connectHinted = false; // 连接按钮当前是否为"参数已改"提示态
+
+function updateConnectButtonHint() {
+    // 端口/群名改过但没重新连接时，连接按钮变橙提示
+    const connectButton = document.getElementById("connect_button");
+    const portInput = document.getElementById("port_input");
+    const pathInput = document.getElementById("path_input");
+    if (!connectButton || !portInput || !pathInput) return;
+    const dirty = portInput.value !== String(port) || pathInput.value !== path;
+    if (dirty) {
+        connectButton.style.backgroundColor = "#f07f1f"; // 橙色，与玩家配色一致
+        connectHinted = true;
+    } else if (connectHinted) {
+        // 改回与当前生效参数一致：清除橙色，恢复连接状态色（不干扰红/绿）
+        connectHinted = false;
+        connectButton.style.backgroundColor = (ws && ws.readyState === WebSocket.OPEN) ? "green" : "";
+    }
 }
 
 function disconnect() {
@@ -135,7 +156,7 @@ function sendMessage(msg) {
 // 前端逻辑
 const MinPlayers = 4; // 最少玩家数
 const MaxPlayersLimit = 6; // 最大玩家数上限
-var MaxPlayers = 4; // 最大玩家数（控制面板可调 4~6）
+var MaxPlayers = 6; // 最大玩家数（控制面板 ± 或主持人 /set 指令可调 4~6）
 
 var Controller = "Admin"; // 控制者的昵称
 var Players = []; // 玩家昵称列表
@@ -156,6 +177,7 @@ var messageQueue = []; // 消息队列
 var processingMessage = false; // 是否正在处理消息
 
 var AudiencesRating = {}; // 观众评分
+var ratingRevealDone = true; // 打分答案是否已浮现完成（浮现期间不重排/伸缩）
 
 function resetAudiencesRating() {
     AudiencesRating = {};
@@ -177,7 +199,9 @@ function getActivePlayerElements(s) {
 }
 
 function getActiveAnswerElements(s) {
-    return Array.from(document.querySelectorAll(s + ":not(#answer_template " + s + ")"));
+    // 排除模板与末尾的"本轮问题"提示条（它不参与计分/排序）
+    return Array.from(document.querySelectorAll(
+        s + ":not(#answer_template " + s + "):not(.question_row):not(.question_row " + s + ")"));
 }
 
 function getPlayers() {
@@ -198,6 +222,43 @@ function Enroll() {
     removePlayersInDocument();
 }
 
+function removePlayerByIndex(index) {
+    // 去掉第 index 个玩家（按玩家卡顺序，从 1 起）：
+    // 报名阶段 = 取消报名；回答/停止回答阶段 = 直接退赛删除（最终解决方案）
+    const rows = Array.from(document.querySelectorAll("#players_wrap .player_content"));
+    const row = rows[index - 1];
+    if (!row) return;
+    // 同步清理该玩家的内部数据，避免删除后以"幽灵"身份参与后续计分：
+    //   PlayersScores —— 历史分会污染最高分（进度条比例 / 夺冠判定）
+    //   PlayersAnswers —— 已记录的答案会在 endRating 时被幽灵分票
+    //   Players —— 冻结玩家列表，防止同名观众被误判为玩家
+    const nameInput = row.getElementsByClassName("player_name")[0];
+    const name = nameInput ? nameInput.value : "";
+    if (name) {
+        delete PlayersScores[name];
+        delete PlayersAnswers[name];
+        Players = Players.filter(p => p !== name);
+    }
+    deletePlayer(row);
+    // 游戏进行中不恢复"添加玩家"按钮（仅报名阶段需要）
+    if (GS.isGaming(GameState)) hideAddPlayerButton();
+}
+
+function clearPlayerAnswerByIndex(index) {
+    // 清掉第 index 个玩家的答案（回答/停止回答阶段，防弹幕事故）
+    const rows = Array.from(document.querySelectorAll("#players_wrap .player_content"));
+    const row = rows[index - 1];
+    if (!row) return;
+    const answerInput = row.getElementsByClassName("player_answer")[0];
+    const answerShow = row.getElementsByClassName("player_answer_show")[0];
+    if (answerInput) answerInput.value = "";
+    if (answerShow) answerShow.innerText = "";
+    const nameInput = row.getElementsByClassName("player_name")[0];
+    if (nameInput && nameInput.value) {
+        delete PlayersAnswers[nameInput.value]; // 同步清除已记录的答案
+    }
+}
+
 function enrollPlayer(pname) {
     // 报名：仅报名阶段、名字非空不重复、未满员
     if (GameState !== GS.Enroll) return;
@@ -211,7 +272,23 @@ function enrollPlayer(pname) {
     addPlayer(pname);
 }
 
+function countDistinctAnswers() {
+    // 已作答的不同答案数量（空答案不计）
+    const answers = getActivePlayerElements(".player_answer")
+        .map(i => i.value.trim())
+        .filter(v => v !== "");
+    return new Set(answers).size;
+}
+
 function StopAnswering() {
+    // 答案不足（≤1 个不同答案）时没有可打分的竞争，直接进入回合间歇
+    if (countDistinctAnswers() <= 1) {
+        GameState = GS.Gaming.Idle;
+        countingDown(0); // 停止计时
+        frozenAnswers();
+        updateGameStateInDocument();
+        return;
+    }
     GameState = GS.Gaming.StopAnswering;
     updateGameStateInDocument();
     frozenAnswers();
@@ -267,10 +344,11 @@ async function startRating() {
     const instructionsElement = Array.from(document.getElementsByClassName("answer_guide"));
     instructionsElement.forEach(e => {e.style.opacity = '';})
     var playerElements = getActivePlayerElements(".player");
+    PlayersAnswers = {}; // 从当前 DOM 重建，清掉可能残留的已删除玩家记录
     for (var i = 0; i < playerElements.length; i++) {
         var pe = playerElements[i];
         var name = pe.getElementsByClassName("player_name")[0].value;
-        var answer = pe.getElementsByClassName("player_answer")[0].value;
+        var answer = normalizeAnswer(pe.getElementsByClassName("player_answer")[0].value);
         PlayersAnswers[name] = answer;
         if (answer !== "") {
             if (!Answers.includes(answer)) {
@@ -281,10 +359,11 @@ async function startRating() {
             }
         }
     }
-    if (Answers.length === 0) {
-        alert("没有有效答案，无法评分");
-        unfrozenAnswers();
-        GameState = GS.Gaming.Answering;
+    if (Answers.length <= 1) {
+        // 答案不足（≤1 个不同答案）时没有可打分的竞争，直接进入回合间歇
+        countingDown(0); // 停止计时
+        frozenAnswers();
+        GameState = GS.Gaming.Idle;
         updateGameStateInDocument();
         return;
     }
@@ -292,6 +371,12 @@ async function startRating() {
     AnswersScores = Object.fromEntries(Answers.map(i => [i, 0]));
     Answers4Rank = Answers.slice(); // 复制一份用于排序
     createAnswersInDocument();
+    // 先让答案条安静浮现（FadeIn 2s），浮现完成后再开始随票数排序/伸缩
+    ratingRevealDone = false;
+    setTimeout(() => {
+        ratingRevealDone = true;
+        updateAnswersScores(); // 把浮现期间收到的票一次性补上
+    }, 2000);
     await countingDown(RATING_SECONDS);
     endRating();
 }
@@ -302,7 +387,8 @@ function endRating() {
     for (var p in PlayersAnswers) {
         var pa = PlayersAnswers[p];
         if (pa in AnswersScores) {
-            PlayersScores[p] += AnswersScores[pa];
+            // 同答案平均分票：该答案的得分由给出此答案的选手均分（60 能被人数整除）
+            PlayersScores[p] += AnswersScores[pa] / AnswersPlayers[pa].length;
         }
     }
     updatePlayersScoresInDocument();
@@ -384,7 +470,8 @@ function processMessage(e) {
                         endRating();
                     }
                 } else if (data.text === GSControl.NextRound) {
-                    if (GS.isGaming(GameState)) {
+                    // 观众打分阶段绝对不能下一回合
+                    if (GS.isGaming(GameState) && GameState !== GS.Gaming.Rating) {
                         GameState = GS.Gaming.Answering;
                         nextRound();
                     }
@@ -396,6 +483,27 @@ function processMessage(e) {
                 } else if (data.text === "1") {
                     // 主持人本人也能扣 1 报名（主持人参赛 / 本地测试）
                     enrollPlayer(data.sender);
+                } else {
+                    // 主持人元指令：
+                    //   /set [i]    设置最大玩家数（4~6，仅待机/报名阶段）
+                    //   /remove [i] 去掉第 i 个玩家（报名=取消报名；回答/停止回答=退赛删除）
+                    //   /clear [i]  清掉第 i 个玩家的答案（回答/停止回答，防弹幕事故）
+                    var metaMatch = /^\/(set|remove|clear)\s*([1-6])\s*$/.exec(data.text);
+                    if (metaMatch) {
+                        var metaIdx = parseInt(metaMatch[2], 10);
+                        var inAnswerPhase = GameState === GS.Gaming.Answering || GameState === GS.Gaming.StopAnswering;
+                        if (metaMatch[1] === "set") {
+                            if (GameState === GS.Idle || GameState === GS.Enroll) {
+                                applyMaxPlayers(metaIdx); // 内部会夹到 4~6
+                            }
+                        } else if (metaMatch[1] === "remove") {
+                            if (GameState === GS.Enroll || inAnswerPhase) {
+                                removePlayerByIndex(metaIdx);
+                            }
+                        } else if (inAnswerPhase) {
+                            clearPlayerAnswerByIndex(metaIdx);
+                        }
+                    }
                 }
                 gameStateChangeFeedback();
                 updateGameStateInDocument();
@@ -418,6 +526,16 @@ function processMessage(e) {
     });
 }
 
+function normalizeAnswer(text) {
+    // 答案格式化：去掉两侧空白，中间的连续空白折叠为 1 个空格
+    var t = String(text).replace(/\s+/g, " ").trim();
+    // 边缘情况：答案为单个 "0" 会与"发送 0 取消投票"冲突，替换为"零"
+    if (t === "0") {
+        t = "零";
+    }
+    return t;
+}
+
 function getAudienceRate(text) {
     var num = parseInt(text);
     if (!isNaN(num)) {
@@ -428,8 +546,9 @@ function getAudienceRate(text) {
         }
     }
 
-    if (text in Answers) {
-        return text; // 存在
+    var normalized = normalizeAnswer(text);
+    if (normalized in Answers) {
+        return normalized; // 存在（按格式化后的文本匹配）
     } else {
         return null; // 不存在
     }
@@ -437,7 +556,7 @@ function getAudienceRate(text) {
 
 function audienceRate(danmaku) {
     if (danmaku.sender in Players) return; // 玩家不能评分
-    if (danmaku.text.trim() === "0") { // 发送 0 取消投票
+    if (String(danmaku.text).trim() === "0") { // 发送 0 取消投票（数字 0 同样有效）
         delete AudiencesRating[danmaku.sender];
         updateAnswersScores();
         return;
@@ -448,16 +567,35 @@ function audienceRate(danmaku) {
     updateAnswersScores();
 }
 
+// 分数内部计算单位：1 分 = 60 单位（1/60）。
+// 60 是 2~6 的最小公倍数，同答案平均分票（除以人数）时必定整除，全程整数无浮点误差。
+const SCORE_UNIT = 60;
+
+function displayScore(units) {
+    // 内部单位 → 显示值：按需给位数（整数不带小数点、能一位精确就一位、
+    // 否则两位）。判断全部走整数运算，避免浮点误差：
+    // 一位小数能精确表示 ⟺ units×10 能被 60 整除；1/6 这类无限小数显示两位近似
+    if (units % SCORE_UNIT === 0) {
+        return String(units / SCORE_UNIT);
+    }
+    if ((units * 10) % SCORE_UNIT === 0) {
+        return (units / SCORE_UNIT).toFixed(1);
+    }
+    return (units / SCORE_UNIT).toFixed(2);
+}
+
 function updateAnswersScores() {
     AnswersScores = Object.fromEntries(Answers.map(i => [i, 0]));
     for (var voter in AudiencesRating) {
         var votedAnswer = AudiencesRating[voter];
         if (votedAnswer in AnswersScores) {
-            AnswersScores[votedAnswer] += 1;
+            AnswersScores[votedAnswer] += SCORE_UNIT; // 每票 1 分
         }
     }
-    // 更新界面
-    updateAnswersScoresInDocument();
+    // 更新界面：答案浮现动画期间只记票不重排，等浮现完成后统一刷新
+    if (ratingRevealDone) {
+        updateAnswersScoresInDocument();
+    }
 }
 
 ///////////////////////////// 和document操作的部分
@@ -475,8 +613,9 @@ function fixTextWidth(e, offset = 28.0 / 8) {
     }
 }
 
-function changeMaxPlayers(delta) {
-    var newMax = Math.min(Math.max(MaxPlayers + delta, MinPlayers), MaxPlayersLimit);
+function applyMaxPlayers(target) {
+    // 绝对值设置最大玩家数（夹到 4~6，且不低于当前在座人数）
+    var newMax = Math.min(Math.max(target, MinPlayers), MaxPlayersLimit);
     if (newMax === MaxPlayers) return;
     var count = getActivePlayerElements(".player_name").length;
     if (newMax < count) {
@@ -487,6 +626,10 @@ function changeMaxPlayers(delta) {
     const show = document.getElementById("max_players_show");
     if (show) show.innerText = MaxPlayers;
     if (count < MaxPlayers) showAddPlayerButton(); // 提高上限时重新显示“添加玩家”按钮
+}
+
+function changeMaxPlayers(delta) {
+    applyMaxPlayers(MaxPlayers + delta);
 }
 
 function setControllerNickname() {
@@ -637,13 +780,29 @@ function createAnswersInDocument() {
     answersWrap.innerHTML = ""; // 清空
 
     const answersTemplate = document.getElementById("answer_template");
+    const totalRows = Answers.length + 1; // 第 0 条是"本轮问题"提示条，其后是各答案条
+
+    // 第 0 条："本轮问题"提示条（不参与投票/计分/排序）
+    var qRow = answersTemplate.cloneNode(true);
+    qRow.id = "";
+    qRow.style.display = "";
+    qRow.classList.add("question_row");
+    qRow.style.height = 100. / totalRows + "%";
+    qRow.style.top = "0%";
+    var qContent = qRow.getElementsByClassName("answer_content")[0];
+    qContent.innerText = (question !== null) ? question : "";
+    qRow.getElementsByClassName("answer_score")[0].innerText = "";
+    answersWrap.appendChild(qRow);
+    // 复用玩家卡的自动压缩：延到下一帧（状态类已切换、容器已可见）再量宽度，否则量到 0
+    requestAnimationFrame(() => fixTextWidth(qContent, 0));
+
     for (var i = 0; i < Answers.length; i++) {
         var at = answersTemplate.cloneNode(true);
         at.id = "";
         at.style.display = "";
 
-        at.style.height = 100./Answers.length + "%"; // 平均分配高度
-        at.style.top = (i * 100./Answers.length) + "%";
+        at.style.height = 100. / totalRows + "%"; // 平均分配高度
+        at.style.top = ((i + 1) * 100. / totalRows) + "%"; // 第 0 格让给问题条
 
         var answerText = at.getElementsByClassName("answer_content")[0];
         answerText.innerText = (i + 1) + ". " + Answers[i] + "： ";
@@ -663,6 +822,8 @@ function createAnswersInDocument() {
         }
         answersWrap.appendChild(at);
     }
+    // 答案数 ≥5 时标记，供 CSS 缩小字号
+    answersWrap.classList.toggle("many_answers", Answers.length >= 5);
 }
 
 function updateAnswersScoresInDocument() {
@@ -673,16 +834,16 @@ function updateAnswersScoresInDocument() {
         var answerIndex = ae.getAttribute("data-answer-index");
         var scoreElement = ae.getElementsByClassName("answer_score")[0];
         if (answerIndex in AnswersScores) {
-            scoreElement.innerText = AnswersScores[answerIndex];
+            scoreElement.innerText = displayScore(AnswersScores[answerIndex]);
         } else {
-            scoreElement.innerText = "0";
+            scoreElement.innerText = displayScore(0);
         }
 
         var rank = Answers4Rank.sort((a, b) => AnswersScores[b] - AnswersScores[a]).indexOf(answerIndex);
 
         var maxScore = Math.max(...Object.values(AnswersScores), 0);
         var aw = answerWraps[i];
-        aw.style.top = rank * (100./Answers.length) + "%";
+        aw.style.top = (rank + 1) * (100. / (Answers.length + 1)) + "%"; // 第 0 格是"本轮问题"条
         aw.classList.add('bigger');
         void aw.offsetWidth; // 触发重绘
         aw.classList.remove('bigger');
@@ -694,7 +855,7 @@ function updateAnswersScoresInDocument() {
 
 function playerAnswer(data) {
     var pname = data.sender;
-    var panswer = data.text.trim();
+    var panswer = normalizeAnswer(data.text); // 去首尾空白 + 中间连续空格折叠
     if (!Players.includes(pname)) {
         return; // 非玩家
     }
@@ -727,10 +888,10 @@ function updatePlayersScoresInDocument() {
         var scoreElement = pe.getElementsByClassName("player_score")[0];
         var progressElement = pe.getElementsByClassName("player_progress")[0];
         if (name in PlayersScores) {
-            scoreElement.innerText = PlayersScores[name];
+            scoreElement.innerText = displayScore(PlayersScores[name]);
             progressElement.style.width = (maxScore === 0 ? 0 : (PlayersScores[name] / maxScore * 100)) + "%";
         } else {
-            scoreElement.innerText = "0";
+            scoreElement.innerText = displayScore(0);
             progressElement.style.width = "0%";
         }
     }
@@ -819,7 +980,7 @@ function set_congratulations() {
         var scoreElement = pe.getElementsByClassName("player_score")[0];
         var playerAnswerShow = pe.getElementsByClassName("player_answer_show")[0];
         if (name in PlayersScores && PlayersScores[name] === maxScore) {
-            scoreElement.innerText = PlayersScores[name];
+            scoreElement.innerText = displayScore(PlayersScores[name]);
             playerAnswerShow.innerText = "!?强强?!";
             fixTextWidth(playerAnswerShow, 0);
         }
