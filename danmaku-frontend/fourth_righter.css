@@ -408,7 +408,7 @@ div#container {
 
 .question_box {
     position: relative; /* 需要相对定位，否则 ::before 内边框定位错乱 */
-    width: min(48rem, 80%);
+    width: min(56rem, 84%);
     max-height: 100%;
     overflow: hidden;
     background: white;
@@ -425,6 +425,28 @@ div#container {
     overflow-wrap: break-word;
     opacity: 0;
     transition: opacity 2s;
+}
+
+/* 题目正文 + 出题人：一起被 JS 缩放进白框（transform-origin 居中，缩放后仍居中） */
+.question_body {
+    transform-origin: center center;
+}
+
+.question_text {
+    overflow-wrap: break-word;
+}
+
+/* 出题人：题目下方一行小字（跟着题目一起缩放，所以用 em） */
+.question_author {
+    margin-top: 0.5rem;
+    font-size: 0.4em;
+    font-weight: normal;
+    color: #666;
+    letter-spacing: 0.05em;
+}
+
+.question_author:empty {
+    display: none;
 }
 
 .question_box::before {
@@ -450,6 +472,61 @@ div#container {
 
 input.player_answer::placeholder {
     color: transparent;
+}
+
+/* ============================
+   观众贴表情：从答案旁边"长出来"、飞走淡出（直播感）
+   ============================ */
+
+.reaction_fly_layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none; /* 纯装饰，绝不挡点击 */
+    z-index: 80;
+    overflow: hidden;
+}
+
+.reaction_fly {
+    position: absolute;
+    width: 3.2rem;
+    height: 3.2rem;
+    margin: -1.6rem 0 0 -1.6rem; /* 以锚点为心往外长 */
+    transform-origin: center center;
+    animation: reaction_fly_out 1.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    will-change: transform, opacity;
+}
+
+.reaction_fly img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 0.22rem rgba(0, 0, 0, 0.35));
+}
+
+/* 图片拿不到时退回直接渲染字符（不依赖外网） */
+.reaction_fly.reaction_fly_text {
+    font-size: 2.6rem;
+    line-height: 3.2rem;
+    text-align: center;
+}
+
+@keyframes reaction_fly_out {
+    0% {
+        transform: scale(0.2) translate(0, 0) rotate(0deg);
+        opacity: 0;
+    }
+    18% {  /* 长出来 */
+        transform: scale(1.15) translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
+    45% {
+        transform: scale(1) translate(0, -1.2rem) rotate(-6deg);
+        opacity: 1;
+    }
+    100% { /* 飞走淡出（每张随机方向，见 JS 里的 --fly-* ） */
+        transform: scale(0.85) translate(var(--fly-x, 4rem), var(--fly-y, -9rem)) rotate(var(--fly-rot, 18deg));
+        opacity: 0;
+    }
 }
 
 .state_answering input.player_answer::placeholder {
@@ -1148,4 +1225,269 @@ div#players_wrap {
     height: 100%;
     box-sizing: border-box;
     margin: 0;
+}
+
+/* ============================================================
+   报名池（扣 1 候选）——只在报名阶段显示
+   主区上半：报名气泡；主区下半：候选池 + 已玩过名单
+   ============================================================ */
+.character_wrap .enroll_guide {
+    top: calc(50% - 5rem); /* 让出下半屏给候选池 */
+}
+
+.candidates_wrap {
+    position: absolute;
+    top: calc(50% - 0.6rem);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(46rem, 86%); /* 两侧留白要容得下"规则介绍"菱形按钮（它挂在面板右外侧） */
+    max-height: 40%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.7rem 1rem;
+    background: white;
+    border: calc(3.5rem / 16) solid black;
+    border-radius: calc(22rem / 16);
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
+    font-family: 'JinLing', Arial;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s;
+}
+
+.candidates_wrap::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border: calc(1.5rem / 16) solid black;
+    left: var(--distance);
+    top: var(--distance);
+    right: var(--distance);
+    bottom: var(--distance);
+    --distance: calc(2.3rem / 16);
+    border-radius: calc(22rem / 16 - 1.5rem / 16 - var(--distance));
+}
+
+/* 只有报名阶段可见（待机/游戏中一律淡出） */
+.state_enroll .candidates_wrap {
+    opacity: 1;
+}
+
+.candidates_title {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.6rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.1;
+    z-index: 1;
+}
+
+.candidates_counter {
+    font-size: 1.2rem;
+    white-space: nowrap;
+}
+
+/* 报名进度条：进度走满即自动抽选 */
+.candidates_progress {
+    position: relative;
+    width: 100%;
+    height: 0.55rem;
+    border: calc(1.5rem / 16) solid black;
+    border-radius: 0.4rem;
+    overflow: hidden;
+    background: white;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+#candidates_progress_bar {
+    width: 0%;
+    height: 100%;
+    background: #f07f1f;
+    transition: width 0.35s ease;
+}
+
+.candidates_list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    gap: 0.3rem 0.45rem;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.candidate_chip {
+    font-size: 1.15rem;
+    line-height: 1.25;
+    padding: 0 0.45rem;
+    border: calc(1.5rem / 16) solid black;
+    border-radius: 0.6rem;
+    white-space: nowrap;
+    animation: popOut 0.4s cubic-bezier(0.35, 1.4, 0.7, 1);
+}
+
+/* 已抽中上场的选手：反色突出 */
+.candidate_chip.drawn {
+    background: black;
+    color: white;
+}
+
+/* 屏上提示（已玩过被跳过 / 报名池满 / 抽选完成）
+   贴在屏幕最底那条空带上：主内容区下面的 40px 余量，
+   不能往上挪 —— 往上会压住问题框下沿和选手卡 */
+.hint_wrap {
+    position: fixed;
+    left: 50%;
+    bottom: 0.15rem;
+    transform: translateX(-50%) translateY(0.6rem);
+    max-width: 92vw;
+    padding: 0.15rem 1rem;
+    background: white;
+    border: calc(3rem / 16) solid black;
+    border-radius: calc(16rem / 16);
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
+    font-family: 'JinLing', Arial;
+    font-weight: bold;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hint_wrap.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.played_note {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    text-align: center;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 1;
+}
+
+/* 控制面板里的主持人状态行 */
+.controller_show {
+    font-size: 0.85rem;
+    line-height: 1.25;
+    text-align: center;
+    width: calc(4em + 21rem / 16);
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   ④ 答题审核：选手答完后是「待审核」，主持人给那条消息贴表情才「已通过」；
+   没通过的答案留在大屏上（灰字 + 待审核），但不参与打分
+   ============================================================ */
+.audit_toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.audit_toggle input {
+    margin: 0;
+}
+
+/* 审核角标放在分数条右端（那里是空的），不要放在答案文字上——
+   长答案会被 fixTextWidth 横向拉满整行，右上角放角标必定压字 */
+.player_score_wrap::after {
+    content: "";
+    position: absolute;
+    right: 0.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 0.22rem;
+    border-radius: 0.35rem;
+    background: white;
+    font-family: 'JinLing', Arial;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    pointer-events: none;
+}
+
+.player_content.audit_pending .player_score_wrap::after {
+    content: "待审核";
+    color: #8c8c8c;
+}
+
+.player_content.audit_pending .player_answer_show {
+    color: #9a9a9a;
+}
+
+.player_content.audit_ok .player_score_wrap::after {
+    content: "✓";
+    font-weight: bold;
+    color: #2e8b2e;
+}
+
+/* ============================================================
+   1080p 兜底：常规屏下主区列很窄（面板 + 玩家区吃掉大半宽度），
+   候选池要整体收紧，否则名单会被 max-height 裁掉。
+   ⚠️ 必须放在文件末尾：候选池/审核角标的基础样式就在上面，
+   同优先级下后定义者胜，写在中间那个 @media 块里是无效的。
+   ============================================================ */
+@media (max-width: 2200px) {
+    .candidates_wrap {
+        max-height: 58%;
+        gap: 0.2rem;
+        padding: 0.45rem 0.6rem;
+        border-width: calc(3rem / 16);
+        /* 比主基准窄一档：1080p 下"规则介绍"菱形按钮挂在面板右外侧，
+           会把候选框左下角压掉一条 */
+        width: min(46rem, 80%);
+    }
+    .candidates_wrap::before {
+        display: none; /* 小尺寸下内框太挤 */
+    }
+    .candidates_title {
+        font-size: 1.05rem;
+        gap: 0.3rem;
+    }
+    .candidates_counter {
+        font-size: 0.95rem;
+    }
+    .candidates_progress {
+        height: 0.42rem;
+    }
+    .candidates_list {
+        gap: 0.2rem 0.3rem;
+    }
+    .candidate_chip {
+        font-size: 0.85rem;
+        padding: 0 0.28rem;
+        border-width: calc(1rem / 16);
+        border-radius: 0.4rem;
+    }
+    .played_note {
+        font-size: 0.78rem;
+        white-space: normal; /* 宁可折成两行，也不要截断成"本轮不…" */
+    }
+    .hint_wrap {
+        font-size: 0.75rem;
+        padding: 0.12rem 0.7rem;
+    }
 }
