@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>互动环节</title>
-        <link rel="stylesheet" type="text/css" href="/fourth_righter.css">
+        <link rel="stylesheet" type="text/css" href="fourth_righter.css">
         <style>
             /* 模板注入的每日抽签元素，游戏页不需要展示 */
             #omikuji {display: none;}
@@ -14,13 +14,19 @@
         <div id="main_content" class="state_idle">
             <div id="control_panel" class="control_wrap">
                 <button id="add_player_btn" onclick="addPlayer()">添加玩家</button>
+                <button id="clear_played_btn" onclick="clearPlayed()">清空已玩过</button>
+                <button id="reset_questions_btn" onclick="resetQuestions()">重置题库</button>
+                <label class="audit_toggle" title="开启后：选手的答案要等主持人贴表情才算通过，没通过的答案不参与打分">
+                    <input type="checkbox" id="audit_toggle" checked onchange="setAuditEnabled(this.checked)">答案需审核
+                </label>
                 <input type="text" id="controller_nickname_input" value="Admin" oninput="setControllerNickname()">
-                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartEnroll})})">开始报名</button>
-                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartGame})})">开始游戏</button>
-                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.StartRating})})">开始打分</button>
-                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.EndRating})})">结束打分</button>
-                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.NextRound})})">下一回合</button>
-                <button onclick="onMessage({data: JSON.stringify({sender: Controller, text: GSControl.EndGame})})">结束游戏</button>
+                <div id="controller_show" class="controller_show">主持人：Admin</div>
+                <button onclick="onControllerCommand(GSControl.StartEnroll)">开始报名</button>
+                <button onclick="onControllerCommand(GSControl.StartGame)">开始游戏</button>
+                <button onclick="onControllerCommand(GSControl.StartRating)">开始打分</button>
+                <button onclick="onControllerCommand(GSControl.EndRating)">结束打分</button>
+                <button onclick="onControllerCommand(GSControl.NextRound)">下一回合</button>
+                <button onclick="onControllerCommand(GSControl.EndGame)">结束游戏</button>
                 <button onclick="toggleTestSend(this)">测试弹幕</button>
             </div>
             <div class="game_state_wrap_wrap">
@@ -56,8 +62,24 @@
             </div>
             <div class="character_wrap">
                 <div class="enroll_guide">孩子们，扣1报名参加</div>
+                <div class="candidates_wrap">
+                    <div class="candidates_title">
+                        <span id="candidates_status">报名中</span>
+                        <span class="candidates_counter"><span id="candidates_count">0</span> / <span id="candidates_target">12</span></span>
+                    </div>
+                    <div class="candidates_progress"><div id="candidates_progress_bar"></div></div>
+                    <div id="candidates_list" class="candidates_list"></div>
+                    <div class="played_note">
+                        已玩过 <span id="played_count">0</span> 人，本轮不再参与抽选<span id="played_names"></span>
+                    </div>
+                </div>
                 <div class="answer_guide answer_guide_1">请选手回答，观众主观打分</div>
-                <div id="question" class="question_box"></div>
+                <div id="question" class="question_box">
+                    <div id="question_body" class="question_body">
+                        <div id="question_text" class="question_text"></div>
+                        <div id="question_author" class="question_author"></div>
+                    </div>
+                </div>
                 <div class="answer_guide answer_guide_2">请观众不要在弹幕群里发言</div>
             </div>
             <div class="players_wrap_wrap">
@@ -67,6 +89,8 @@
             <div class="answers_wrap_wrap">
                 <div id="answers_wrap"></div>
             </div>
+            <!-- 观众贴表情的浮层：表情从答案旁边长出来、飞走淡出（不受答案条的 overflow 裁剪） -->
+            <div id="reaction_fly_layer" class="reaction_fly_layer"></div>
             <div class="instruction_wrap_wrap">
                 <div id="instruction_wrap" class="instruction_wrap" style="display:none">
                     <button class="close_instruction_button" onclick="close_instruction()"></button>
@@ -86,8 +110,9 @@
                         <div>
                             <h2>游戏流程——报名环节</h2>
                             <hr>
-                            <p>游戏开始前，由主持人在弹幕群里说<span>“开始报名”</span>后，大家在弹幕群内扣1报名，报名结果同步在大屏幕上。</p>
-                            <p>凑齐4名选手后（人数可在控制面板调为4~6人），游戏开始。</p>
+                            <p>游戏开始前，由主持人在弹幕群里说<span>“开始报名”</span>后，大家在弹幕群内扣1报名。</p>
+                            <p>报名的人先进入候选池，<b>大屏上的进度条走满（上场人数的 2 倍）时会自动随机抽选</b>，被抽中的人当场出现在大屏幕上。</p>
+                            <p><b>已经上过场的人会自动跳过</b>，不会重复抽到；主持人本人不参与报名与抽选。</p>
                         </div>
                     </div>
                     <div class="fantasy_guide_div_1 instruction">
@@ -95,6 +120,7 @@
                             <h2>游戏流程——回答环节</h2>
                             <hr>
                             <p>游戏开始后，大屏幕随机展示一个主观问题，在时限内，选手要在弹幕群里自由回答。</p>
+                            <p><b>每道题只出一次</b>，不会重复出现。</p>
                             <p><b>注意：回答在弹幕群里进行，在回答环节请观众不要在弹幕群里说话。</b></p>
                         </div>
                     </div>
@@ -110,6 +136,7 @@
                     </div>
                 </div>
             </div>
+            <div id="hint_wrap" class="hint_wrap"></div>
             <div id="player_template" class="player_content" style="display:none">
                 <div class="player fantasy_guide_div_1">
                     <button class="delete_player_button">X</button>
@@ -130,8 +157,8 @@
             </div>
         </div>
     </body>
-    <script src="/fourth_righter_questions.js"></script>
-    <script src="/fourth_righter.js"></script>
+    <script src="fourth_righter_questions.js"></script>
+    <script src="fourth_righter.js"></script>
     <script>
         var testPlayers = ["小明明明明明明明", "小红红红红", "小刚刚", "小华华华华", "小李李李李李李李李李李李李李", "小王王王王", "小赵赵赵赵赵赵赵", "小钱钱钱钱钱钱钱钱钱钱钱", "小孙孙孙孙孙", "小周周周周周"];
         var testAnswers = [
@@ -169,16 +196,18 @@
 
         function _testSend() {
             if (GameState === GS.Enroll) {
-                const sender = testPlayers[Math.floor(Math.random() * testPlayers.length)];
-                onMessage({data: JSON.stringify({sender: sender, text: '1'})});
+                // 合成 senderId，走真实后端的 uid 身份路径
+                const i = Math.floor(Math.random() * testPlayers.length);
+                onMessage({data: JSON.stringify({sender: testPlayers[i], senderId: "test:" + i, text: '1'})});
             } else if (GameState === GS.Gaming.Rating) {
-                const sender = testSenders[Math.floor(Math.random() * testSenders.length)];
+                const i = Math.floor(Math.random() * testSenders.length);
                 const text = Math.floor(Math.random() * Answers.length) + 1;
-                onMessage({data: JSON.stringify({sender: sender, text: text})});
+                onMessage({data: JSON.stringify({sender: testSenders[i], senderId: "aud:" + i, text: text})});
             } else if (GameState === GS.Gaming.Answering || GameState === GS.Gaming.StopAnswering) {
-                const sender = Players[Math.floor(Math.random() * Players.length)];
+                const uid = PlayerOrder[Math.floor(Math.random() * PlayerOrder.length)];
+                if (!uid) return;
                 const text = testAnswers[Math.floor(Math.random() * testAnswers.length)];
-                onMessage({data: JSON.stringify({sender: sender, text: text})});
+                onMessage({data: JSON.stringify({sender: userName(uid), senderId: senderIdOf(uid), text: text})});
             }
         }
     </script>

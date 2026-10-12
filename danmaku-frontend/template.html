@@ -3,7 +3,7 @@
     <head>
         <meta charset = "utf-8">
         <meta name="viewport" content="width=device-width initial-scale=1">
-        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+        <!-- 本页部署在局域网、走明文 HTTP：这条 CSP 会把同源静态资源升级成 https、把 ws:// 升级成 wss://，直接打断页面资源和大屏连弹幕姬的连接，因此移除（按 nekocast 部署实践）。 -->
         <title>幻想指南</title>
         <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
