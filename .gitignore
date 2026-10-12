@@ -1,0 +1,22 @@
+# ===== 本地 / 运行时文件（不进仓库）=====
+
+# 本地交接文档与笔记
+部署交接-给运维agent.md
+*.local.md
+
+# Python（模拟器）
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# 运行数据与日志
+*.log
+*.db
+*.db-wal
+*.db-shm
+
+# 就地备份（改文件前留的那种 .bak-日期）
+*.bak-*
+*.bak_*
+*.orig
