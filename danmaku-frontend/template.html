@@ -8,18 +8,18 @@
         <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css" />
+        <!-- 局域网部署：不依赖 CDN 字体（lxgw-wenkai-webfont@1.1.0），回退系统字体 -->
         <!-- Lite version -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+        <!-- 局域网部署：不依赖 CDN 字体（lxgw-wenkai-lite-webfont@1.1.0），回退系统字体 -->
         <!-- TC version -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-tc-webfont@1.0.0/style.css" />
+        <!-- 局域网部署：不依赖 CDN 字体（lxgw-wenkai-tc-webfont@1.0.0），回退系统字体 -->
         <!-- Screen version -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
+        <!-- 局域网部署：不依赖 CDN 字体（lxgw-wenkai-screen-webfont@1.1.0），回退系统字体 -->
         <link rel="manifest" href="/images/favicon/site.webmanifest">
         <!-- <link rel="stylesheet" href="/template/newyear.css"> -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/normal.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/abnormal.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/particle.css">
+        <link rel="stylesheet" href="normal.css">
+        <link rel="stylesheet" href="abnormal.css">
+        <link rel="stylesheet" href="particle.css">
         <style>
         </style>
     </head>
@@ -177,7 +177,7 @@
                                         <li><a href="/about/#what_is_pdot_studio"><span>P大点工作室</span></a></li>
                                     </ul>
                                     <div class="powered_by">
-                                        Powered by <img src="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/PStudio.png" alt = "Logo of the Studio (need to be confirm)">
+                                        Powered by <img src="PStudio.png" alt = "Logo of the Studio (need to be confirm)">
                                     </div>
                                 </div>
                             </div>
@@ -197,7 +197,7 @@
             <div class="particle-container"></div>
         </div>
     </body>
-    <script src="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/cookie.js"></script>
+    <script src="cookie.js"></script>
     <script>
         /* 恶趣味 */
 
@@ -325,16 +325,16 @@
     <script>
         if (Math.random() <= 0.01) {
             var header = document.getElementById('header');
-            header.style.backgroundImage = "url(https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/touhouFantasyGuideLOGO_glitch.svg)";
+            header.style.backgroundImage = "url(touhouFantasyGuideLOGO_glitch.svg)";
 
             $("<link>").attr({
                 rel:  "stylesheet",
                 type: "text/css",
-                href: "https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/etalpmet.css"
+                href: "etalpmet.css"
             }).appendTo("head");
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/template/template.js"></script>
+    <script src="template.js"></script>
     <script>
         // 暂      
         async function think() {

@@ -1,0 +1,271 @@
+/*
+def f(n):
+	a = np.absolute(3*np.random.randn(n))
+	return a
+
+def g(n):
+	a = f(n)
+	b = 0.2 * np.random.rand(n) + 0.1
+	T = 0
+	t = 0
+	if_open = True
+	result = []
+	for i in range(n):
+		T += a[i] if if_open else b[i]
+		if_open = not if_open
+	if_open = True
+	for i in range(n):
+		result.append("%.4f" % (100*t/T) + "% {"+ (s_open if if_open else s_close)+"}")
+		t += a[i] if if_open else b[i]
+		if_open = not if_open
+	print(T)
+	return "\n".join(result)
+*/
+
+@keyframes sukima_blink {
+    0.0000% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    0.5906% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    0.6722% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    1.7390% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    1.7971% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    2.7671% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    2.8332% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    4.1741% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    4.2651% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    4.7413% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    4.7995% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    5.1426% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    5.1804% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    5.3294% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    5.4300% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    7.4120% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    7.4533% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    7.8612% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    7.9479% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    9.3782% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    9.4374% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    10.0633% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    10.1231% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    10.3605% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    10.3987% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    10.6278% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    10.6829% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    11.3793% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    11.4476% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    11.7754% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    11.8398% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    12.2017% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    12.2391% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    14.5886% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    14.6502% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    17.1708% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    17.2410% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    20.2636% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    20.3656% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    22.1629% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    22.2175% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    23.2248% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    23.3115% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    24.1252% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    24.1814% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    24.9062% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    25.0001% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    26.0080% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    26.1067% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    27.2913% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    27.3667% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    28.7027% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    28.7415% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    29.8516% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    29.9259% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    30.8192% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    30.8634% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    31.7242% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    31.8092% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    32.8156% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    32.8957% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    34.2931% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    34.3957% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    34.8889% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    34.9723% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    36.3834% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    36.4449% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    39.0868% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    39.1472% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    40.0498% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    40.1251% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    42.3158% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    42.3861% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    42.4632% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    42.5632% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    43.8382% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    43.8854% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    44.5516% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    44.5989% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    45.1000% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    45.1589% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    45.1993% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    45.2661% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    45.6452% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    45.6851% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    47.6515% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    47.7041% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    47.7069% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    47.7667% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    49.3720% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    49.4760% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    49.8550% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    49.9148% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    51.2754% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    51.3606% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    51.3624% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    51.4403% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    53.4274% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    53.4977% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    53.7483% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    53.8517% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    54.1391% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    54.2351% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    54.6523% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    54.6928% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    55.2252% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    55.2892% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    55.6664% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    55.7512% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    56.5749% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    56.6522% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    56.8134% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    56.8861% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    57.1266% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    57.1904% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    57.2149% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    57.3159% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    57.9510% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    57.9910% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    58.2477% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    58.2991% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    59.3368% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    59.4027% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    60.6342% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    60.7271% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    61.5248% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    61.5964% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    61.9365% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    62.0127% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    62.0267% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    62.1011% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    62.6907% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    62.7579% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    65.4477% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    65.5028% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    66.3621% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    66.4343% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    66.5186% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    66.5636% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    66.7737% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    66.8117% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    67.5468% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    67.6069% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    69.0309% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    69.0679% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    71.1415% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    71.2011% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    72.8185% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    72.9161% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    73.2322% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    73.3280% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    74.7857% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    74.8803% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    75.8793% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    75.9748% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    76.7046% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    76.7799% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    78.8710% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    78.9162% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    81.1145% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    81.1613% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    81.9480% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    82.0295% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    82.3657% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    82.4592% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    82.9065% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    82.9766% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    83.0677% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    83.1371% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    83.3973% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    83.4683% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    85.4360% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    85.4935% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    85.9350% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    85.9747% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    86.0829% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    86.1775% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    86.4616% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    86.5451% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    86.8950% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    86.9826% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    87.7427% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    87.7950% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    89.3412% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    89.4086% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    91.7959% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    91.8632% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    94.5157% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    94.5683% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    95.2465% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    95.3376% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    96.1688% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    96.2706% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    96.8983% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    96.9824% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    97.0845% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    97.1195% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    99.5438% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+    99.6288% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_open.svg");}
+    99.8991% {background-image: url("https://cdn.jsdelivr.net/gh/Nipporita/fantasyguide_statics/images/sukima_close.svg");}
+}
+
+.sukima > *::before {
+    animation-name: sukima_blink;
+    animation-duration: 300s;
+    animation-timing-function: step-end;
+    animation-iteration-count: infinite;
+    animation-delay: 5s;
+}
+
+div.fantasy_guide_div_1 {
+    filter: invert();
+}
+
+#header {
+    filter: invert();
+}
+
+body {
+    background-color: black;
+}
+
+.main_background {
+    filter: invert();
+}
+
+.touhou_study {
+    filter: invert();
+}
+
+#footer_wrap footer {
+    color: white;
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+}
+
+#footer_wrap footer a {
+    color: white;
+}
+
+.login_content .user_profile img {
+    filter: invert() hue-rotate(296deg) saturate(0.9) brightness(0.9);
+}
+
+.powered_by img {
+    filter: invert() hue-rotate(296deg) saturate(1.5) brightness(0.9);
+}

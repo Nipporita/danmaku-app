@@ -1,0 +1,365 @@
+.particle-container {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -99;
+}
+
+.particle {
+    position: absolute;
+    bottom: 0;
+    background: rgb(200, 200, 200);
+    border-radius: 50%;
+    opacity: 0;
+    filter: blur(1px);
+}
+
+.dark.particle {
+    background: rgb(55, 55, 55);
+}
+
+.particle_rise_0 {
+    animation-name: rise_0, fade;
+    animation-timing-function: linear, linear;
+    animation-iteration-count: infinite, infinite;
+}
+
+.particle_rise_1 {
+    animation-name: rise_1, fade;
+    animation-timing-function: linear, linear;
+    animation-iteration-count: infinite, infinite;
+}
+
+.particle_rise_2 {
+    animation-name: rise_2, fade;
+    animation-timing-function: linear, linear;
+    animation-iteration-count: infinite, infinite;
+}
+
+@keyframes fade {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+
+@keyframes rise_0 {
+    
+    0.00% {transform: translateX(-0.42vw) translateY(7.32vh);}
+    1.00% {transform: translateX(-1.35vw) translateY(6.12vh);}
+    2.00% {transform: translateX(-2.23vw) translateY(4.91vh);}
+    3.00% {transform: translateX(-3.07vw) translateY(3.69vh);}
+    4.00% {transform: translateX(-3.83vw) translateY(2.45vh);}
+    5.00% {transform: translateX(-4.52vw) translateY(1.20vh);}
+    6.00% {transform: translateX(-5.12vw) translateY(-0.06vh);}
+    7.00% {transform: translateX(-5.62vw) translateY(-1.33vh);}
+    8.00% {transform: translateX(-6.02vw) translateY(-2.62vh);}
+    9.00% {transform: translateX(-6.32vw) translateY(-3.91vh);}
+    10.00% {transform: translateX(-6.51vw) translateY(-5.22vh);}
+    11.00% {transform: translateX(-6.58vw) translateY(-6.53vh);}
+    12.00% {transform: translateX(-6.55vw) translateY(-7.85vh);}
+    13.00% {transform: translateX(-6.42vw) translateY(-9.18vh);}
+    14.00% {transform: translateX(-6.18vw) translateY(-10.51vh);}
+    15.00% {transform: translateX(-5.84vw) translateY(-11.85vh);}
+    16.00% {transform: translateX(-5.42vw) translateY(-13.20vh);}
+    17.00% {transform: translateX(-4.92vw) translateY(-14.55vh);}
+    18.00% {transform: translateX(-4.35vw) translateY(-15.90vh);}
+    19.00% {transform: translateX(-3.72vw) translateY(-17.26vh);}
+    20.00% {transform: translateX(-3.04vw) translateY(-18.61vh);}
+    21.00% {transform: translateX(-2.33vw) translateY(-19.97vh);}
+    22.00% {transform: translateX(-1.60vw) translateY(-21.33vh);}
+    23.00% {transform: translateX(-0.85vw) translateY(-22.69vh);}
+    24.00% {transform: translateX(-0.11vw) translateY(-24.04vh);}
+    25.00% {transform: translateX(0.62vw) translateY(-25.40vh);}
+    26.00% {transform: translateX(1.33vw) translateY(-26.74vh);}
+    27.00% {transform: translateX(1.99vw) translateY(-28.09vh);}
+    28.00% {transform: translateX(2.62vw) translateY(-29.43vh);}
+    29.00% {transform: translateX(3.18vw) translateY(-30.76vh);}
+    30.00% {transform: translateX(3.69vw) translateY(-32.09vh);}
+    31.00% {transform: translateX(4.12vw) translateY(-33.41vh);}
+    32.00% {transform: translateX(4.48vw) translateY(-34.72vh);}
+    33.00% {transform: translateX(4.75vw) translateY(-36.02vh);}
+    34.00% {transform: translateX(4.95vw) translateY(-37.31vh);}
+    35.00% {transform: translateX(5.05vw) translateY(-38.60vh);}
+    36.00% {transform: translateX(5.08vw) translateY(-39.87vh);}
+    37.00% {transform: translateX(5.02vw) translateY(-41.13vh);}
+    38.00% {transform: translateX(4.88vw) translateY(-42.38vh);}
+    39.00% {transform: translateX(4.67vw) translateY(-43.61vh);}
+    40.00% {transform: translateX(4.38vw) translateY(-44.84vh);}
+    41.00% {transform: translateX(4.03vw) translateY(-46.05vh);}
+    42.00% {transform: translateX(3.62vw) translateY(-47.25vh);}
+    43.00% {transform: translateX(3.16vw) translateY(-48.43vh);}
+    44.00% {transform: translateX(2.66vw) translateY(-49.60vh);}
+    45.00% {transform: translateX(2.12vw) translateY(-50.76vh);}
+    46.00% {transform: translateX(1.57vw) translateY(-51.90vh);}
+    47.00% {transform: translateX(0.99vw) translateY(-53.03vh);}
+    48.00% {transform: translateX(0.42vw) translateY(-54.14vh);}
+    49.00% {transform: translateX(-0.15vw) translateY(-55.24vh);}
+    50.00% {transform: translateX(-0.71vw) translateY(-56.32vh);}
+    51.00% {transform: translateX(-1.24vw) translateY(-57.39vh);}
+    52.00% {transform: translateX(-1.74vw) translateY(-58.45vh);}
+    53.00% {transform: translateX(-2.21vw) translateY(-59.49vh);}
+    54.00% {transform: translateX(-2.62vw) translateY(-60.52vh);}
+    55.00% {transform: translateX(-2.99vw) translateY(-61.54vh);}
+    56.00% {transform: translateX(-3.30vw) translateY(-62.54vh);}
+    57.00% {transform: translateX(-3.55vw) translateY(-63.54vh);}
+    58.00% {transform: translateX(-3.74vw) translateY(-64.52vh);}
+    59.00% {transform: translateX(-3.86vw) translateY(-65.48vh);}
+    60.00% {transform: translateX(-3.91vw) translateY(-66.44vh);}
+    61.00% {transform: translateX(-3.91vw) translateY(-67.39vh);}
+    62.00% {transform: translateX(-3.84vw) translateY(-68.32vh);}
+    63.00% {transform: translateX(-3.70vw) translateY(-69.25vh);}
+    64.00% {transform: translateX(-3.51vw) translateY(-70.17vh);}
+    65.00% {transform: translateX(-3.27vw) translateY(-71.08vh);}
+    66.00% {transform: translateX(-2.98vw) translateY(-71.99vh);}
+    67.00% {transform: translateX(-2.65vw) translateY(-72.88vh);}
+    68.00% {transform: translateX(-2.28vw) translateY(-73.78vh);}
+    69.00% {transform: translateX(-1.88vw) translateY(-74.66vh);}
+    70.00% {transform: translateX(-1.46vw) translateY(-75.54vh);}
+    71.00% {transform: translateX(-1.03vw) translateY(-76.42vh);}
+    72.00% {transform: translateX(-0.58vw) translateY(-77.30vh);}
+    73.00% {transform: translateX(-0.14vw) translateY(-78.17vh);}
+    74.00% {transform: translateX(0.30vw) translateY(-79.05vh);}
+    75.00% {transform: translateX(0.72vw) translateY(-79.92vh);}
+    76.00% {transform: translateX(1.12vw) translateY(-80.79vh);}
+    77.00% {transform: translateX(1.50vw) translateY(-81.66vh);}
+    78.00% {transform: translateX(1.84vw) translateY(-82.54vh);}
+    79.00% {transform: translateX(2.15vw) translateY(-83.42vh);}
+    80.00% {transform: translateX(2.41vw) translateY(-84.30vh);}
+    81.00% {transform: translateX(2.63vw) translateY(-85.18vh);}
+    82.00% {transform: translateX(2.80vw) translateY(-86.07vh);}
+    83.00% {transform: translateX(2.93vw) translateY(-86.97vh);}
+    84.00% {transform: translateX(3.00vw) translateY(-87.87vh);}
+    85.00% {transform: translateX(3.02vw) translateY(-88.77vh);}
+    86.00% {transform: translateX(3.00vw) translateY(-89.69vh);}
+    87.00% {transform: translateX(2.92vw) translateY(-90.61vh);}
+    88.00% {transform: translateX(2.80vw) translateY(-91.54vh);}
+    89.00% {transform: translateX(2.64vw) translateY(-92.48vh);}
+    90.00% {transform: translateX(2.44vw) translateY(-93.42vh);}
+    91.00% {transform: translateX(2.20vw) translateY(-94.38vh);}
+    92.00% {transform: translateX(1.93vw) translateY(-95.35vh);}
+    93.00% {transform: translateX(1.63vw) translateY(-96.32vh);}
+    94.00% {transform: translateX(1.32vw) translateY(-97.31vh);}
+    95.00% {transform: translateX(0.99vw) translateY(-98.30vh);}
+    96.00% {transform: translateX(0.65vw) translateY(-99.31vh);}
+    97.00% {transform: translateX(0.31vw) translateY(-100.32vh);}
+    98.00% {transform: translateX(-0.03vw) translateY(-101.35vh);}
+    99.00% {transform: translateX(-0.37vw) translateY(-102.39vh);}
+    100.00% {transform: translateX(-0.69vw) translateY(-103.43vh);}
+}
+
+
+@keyframes rise_1 {
+    
+    0.00% {transform: translateX(-0.28vw) translateY(-1.02vh);}
+    1.00% {transform: translateX(-1.28vw) translateY(-2.10vh);}
+    2.00% {transform: translateX(-2.25vw) translateY(-3.17vh);}
+    3.00% {transform: translateX(-3.17vw) translateY(-4.22vh);}
+    4.00% {transform: translateX(-4.02vw) translateY(-5.27vh);}
+    5.00% {transform: translateX(-4.80vw) translateY(-6.31vh);}
+    6.00% {transform: translateX(-5.49vw) translateY(-7.34vh);}
+    7.00% {transform: translateX(-6.09vw) translateY(-8.36vh);}
+    8.00% {transform: translateX(-6.60vw) translateY(-9.38vh);}
+    9.00% {transform: translateX(-7.00vw) translateY(-10.38vh);}
+    10.00% {transform: translateX(-7.29vw) translateY(-11.38vh);}
+    11.00% {transform: translateX(-7.47vw) translateY(-12.37vh);}
+    12.00% {transform: translateX(-7.55vw) translateY(-13.36vh);}
+    13.00% {transform: translateX(-7.51vw) translateY(-14.34vh);}
+    14.00% {transform: translateX(-7.37vw) translateY(-15.31vh);}
+    15.00% {transform: translateX(-7.13vw) translateY(-16.28vh);}
+    16.00% {transform: translateX(-6.80vw) translateY(-17.24vh);}
+    17.00% {transform: translateX(-6.38vw) translateY(-18.20vh);}
+    18.00% {transform: translateX(-5.87vw) translateY(-19.16vh);}
+    19.00% {transform: translateX(-5.30vw) translateY(-20.11vh);}
+    20.00% {transform: translateX(-4.66vw) translateY(-21.06vh);}
+    21.00% {transform: translateX(-3.97vw) translateY(-22.00vh);}
+    22.00% {transform: translateX(-3.24vw) translateY(-22.95vh);}
+    23.00% {transform: translateX(-2.48vw) translateY(-23.89vh);}
+    24.00% {transform: translateX(-1.70vw) translateY(-24.84vh);}
+    25.00% {transform: translateX(-0.91vw) translateY(-25.78vh);}
+    26.00% {transform: translateX(-0.12vw) translateY(-26.73vh);}
+    27.00% {transform: translateX(0.64vw) translateY(-27.67vh);}
+    28.00% {transform: translateX(1.39vw) translateY(-28.62vh);}
+    29.00% {transform: translateX(2.09vw) translateY(-29.57vh);}
+    30.00% {transform: translateX(2.76vw) translateY(-30.52vh);}
+    31.00% {transform: translateX(3.37vw) translateY(-31.48vh);}
+    32.00% {transform: translateX(3.92vw) translateY(-32.44vh);}
+    33.00% {transform: translateX(4.40vw) translateY(-33.40vh);}
+    34.00% {transform: translateX(4.81vw) translateY(-34.37vh);}
+    35.00% {transform: translateX(5.15vw) translateY(-35.34vh);}
+    36.00% {transform: translateX(5.40vw) translateY(-36.32vh);}
+    37.00% {transform: translateX(5.57vw) translateY(-37.30vh);}
+    38.00% {transform: translateX(5.66vw) translateY(-38.30vh);}
+    39.00% {transform: translateX(5.67vw) translateY(-39.30vh);}
+    40.00% {transform: translateX(5.60vw) translateY(-40.30vh);}
+    41.00% {transform: translateX(5.46vw) translateY(-41.31vh);}
+    42.00% {transform: translateX(5.23vw) translateY(-42.34vh);}
+    43.00% {transform: translateX(4.94vw) translateY(-43.36vh);}
+    44.00% {transform: translateX(4.59vw) translateY(-44.40vh);}
+    45.00% {transform: translateX(4.18vw) translateY(-45.45vh);}
+    46.00% {transform: translateX(3.72vw) translateY(-46.50vh);}
+    47.00% {transform: translateX(3.21vw) translateY(-47.57vh);}
+    48.00% {transform: translateX(2.68vw) translateY(-48.64vh);}
+    49.00% {transform: translateX(2.11vw) translateY(-49.72vh);}
+    50.00% {transform: translateX(1.53vw) translateY(-50.81vh);}
+    51.00% {transform: translateX(0.94vw) translateY(-51.91vh);}
+    52.00% {transform: translateX(0.35vw) translateY(-53.02vh);}
+    53.00% {transform: translateX(-0.24vw) translateY(-54.14vh);}
+    54.00% {transform: translateX(-0.81vw) translateY(-55.27vh);}
+    55.00% {transform: translateX(-1.35vw) translateY(-56.41vh);}
+    56.00% {transform: translateX(-1.87vw) translateY(-57.55vh);}
+    57.00% {transform: translateX(-2.34vw) translateY(-58.70vh);}
+    58.00% {transform: translateX(-2.78vw) translateY(-59.87vh);}
+    59.00% {transform: translateX(-3.16vw) translateY(-61.04vh);}
+    60.00% {transform: translateX(-3.49vw) translateY(-62.21vh);}
+    61.00% {transform: translateX(-3.77vw) translateY(-63.40vh);}
+    62.00% {transform: translateX(-3.99vw) translateY(-64.59vh);}
+    63.00% {transform: translateX(-4.15vw) translateY(-65.79vh);}
+    64.00% {transform: translateX(-4.24vw) translateY(-67.00vh);}
+    65.00% {transform: translateX(-4.27vw) translateY(-68.21vh);}
+    66.00% {transform: translateX(-4.25vw) translateY(-69.42vh);}
+    67.00% {transform: translateX(-4.16vw) translateY(-70.65vh);}
+    68.00% {transform: translateX(-4.02vw) translateY(-71.87vh);}
+    69.00% {transform: translateX(-3.82vw) translateY(-73.10vh);}
+    70.00% {transform: translateX(-3.57vw) translateY(-74.34vh);}
+    71.00% {transform: translateX(-3.28vw) translateY(-75.57vh);}
+    72.00% {transform: translateX(-2.95vw) translateY(-76.81vh);}
+    73.00% {transform: translateX(-2.58vw) translateY(-78.05vh);}
+    74.00% {transform: translateX(-2.19vw) translateY(-79.30vh);}
+    75.00% {transform: translateX(-1.77vw) translateY(-80.54vh);}
+    76.00% {transform: translateX(-1.34vw) translateY(-81.78vh);}
+    77.00% {transform: translateX(-0.90vw) translateY(-83.02vh);}
+    78.00% {transform: translateX(-0.45vw) translateY(-84.27vh);}
+    79.00% {transform: translateX(-0.01vw) translateY(-85.50vh);}
+    80.00% {transform: translateX(0.43vw) translateY(-86.74vh);}
+    81.00% {transform: translateX(0.84vw) translateY(-87.98vh);}
+    82.00% {transform: translateX(1.24vw) translateY(-89.21vh);}
+    83.00% {transform: translateX(1.61vw) translateY(-90.43vh);}
+    84.00% {transform: translateX(1.95vw) translateY(-91.65vh);}
+    85.00% {transform: translateX(2.26vw) translateY(-92.87vh);}
+    86.00% {transform: translateX(2.53vw) translateY(-94.08vh);}
+    87.00% {transform: translateX(2.75vw) translateY(-95.28vh);}
+    88.00% {transform: translateX(2.94vw) translateY(-96.47vh);}
+    89.00% {transform: translateX(3.07vw) translateY(-97.66vh);}
+    90.00% {transform: translateX(3.17vw) translateY(-98.84vh);}
+    91.00% {transform: translateX(3.21vw) translateY(-100.01vh);}
+    92.00% {transform: translateX(3.21vw) translateY(-101.17vh);}
+    93.00% {transform: translateX(3.16vw) translateY(-102.32vh);}
+    94.00% {transform: translateX(3.07vw) translateY(-103.46vh);}
+    95.00% {transform: translateX(2.94vw) translateY(-104.60vh);}
+    96.00% {transform: translateX(2.77vw) translateY(-105.72vh);}
+    97.00% {transform: translateX(2.57vw) translateY(-106.82vh);}
+    98.00% {transform: translateX(2.33vw) translateY(-107.92vh);}
+    99.00% {transform: translateX(2.07vw) translateY(-109.00vh);}
+    100.00% {transform: translateX(1.78vw) translateY(-110.08vh);}
+}
+
+
+@keyframes rise_2 {
+    
+    0.00% {transform: translateX(6.26vw) translateY(-4.52vh);}
+    1.00% {transform: translateX(5.63vw) translateY(-5.62vh);}
+    2.00% {transform: translateX(4.91vw) translateY(-6.73vh);}
+    3.00% {transform: translateX(4.11vw) translateY(-7.84vh);}
+    4.00% {transform: translateX(3.25vw) translateY(-8.97vh);}
+    5.00% {transform: translateX(2.34vw) translateY(-10.10vh);}
+    6.00% {transform: translateX(1.42vw) translateY(-11.24vh);}
+    7.00% {transform: translateX(0.48vw) translateY(-12.39vh);}
+    8.00% {transform: translateX(-0.44vw) translateY(-13.55vh);}
+    9.00% {transform: translateX(-1.33vw) translateY(-14.70vh);}
+    10.00% {transform: translateX(-2.18vw) translateY(-15.87vh);}
+    11.00% {transform: translateX(-2.97vw) translateY(-17.04vh);}
+    12.00% {transform: translateX(-3.69vw) translateY(-18.21vh);}
+    13.00% {transform: translateX(-4.32vw) translateY(-19.38vh);}
+    14.00% {transform: translateX(-4.86vw) translateY(-20.55vh);}
+    15.00% {transform: translateX(-5.29vw) translateY(-21.73vh);}
+    16.00% {transform: translateX(-5.61vw) translateY(-22.90vh);}
+    17.00% {transform: translateX(-5.82vw) translateY(-24.08vh);}
+    18.00% {transform: translateX(-5.92vw) translateY(-25.25vh);}
+    19.00% {transform: translateX(-5.90vw) translateY(-26.41vh);}
+    20.00% {transform: translateX(-5.77vw) translateY(-27.58vh);}
+    21.00% {transform: translateX(-5.53vw) translateY(-28.73vh);}
+    22.00% {transform: translateX(-5.19vw) translateY(-29.89vh);}
+    23.00% {transform: translateX(-4.77vw) translateY(-31.03vh);}
+    24.00% {transform: translateX(-4.26vw) translateY(-32.17vh);}
+    25.00% {transform: translateX(-3.68vw) translateY(-33.30vh);}
+    26.00% {transform: translateX(-3.05vw) translateY(-34.42vh);}
+    27.00% {transform: translateX(-2.37vw) translateY(-35.53vh);}
+    28.00% {transform: translateX(-1.66vw) translateY(-36.62vh);}
+    29.00% {transform: translateX(-0.94vw) translateY(-37.71vh);}
+    30.00% {transform: translateX(-0.21vw) translateY(-38.78vh);}
+    31.00% {transform: translateX(0.51vw) translateY(-39.84vh);}
+    32.00% {transform: translateX(1.20vw) translateY(-40.89vh);}
+    33.00% {transform: translateX(1.85vw) translateY(-41.92vh);}
+    34.00% {transform: translateX(2.45vw) translateY(-42.94vh);}
+    35.00% {transform: translateX(2.99vw) translateY(-43.94vh);}
+    36.00% {transform: translateX(3.47vw) translateY(-44.93vh);}
+    37.00% {transform: translateX(3.87vw) translateY(-45.89vh);}
+    38.00% {transform: translateX(4.18vw) translateY(-46.85vh);}
+    39.00% {transform: translateX(4.42vw) translateY(-47.78vh);}
+    40.00% {transform: translateX(4.56vw) translateY(-48.70vh);}
+    41.00% {transform: translateX(4.61vw) translateY(-49.61vh);}
+    42.00% {transform: translateX(4.58vw) translateY(-50.49vh);}
+    43.00% {transform: translateX(4.45vw) translateY(-51.36vh);}
+    44.00% {transform: translateX(4.25vw) translateY(-52.21vh);}
+    45.00% {transform: translateX(3.97vw) translateY(-53.05vh);}
+    46.00% {transform: translateX(3.63vw) translateY(-53.87vh);}
+    47.00% {transform: translateX(3.22vw) translateY(-54.67vh);}
+    48.00% {transform: translateX(2.76vw) translateY(-55.46vh);}
+    49.00% {transform: translateX(2.25vw) translateY(-56.23vh);}
+    50.00% {transform: translateX(1.72vw) translateY(-56.98vh);}
+    51.00% {transform: translateX(1.16vw) translateY(-57.72vh);}
+    52.00% {transform: translateX(0.60vw) translateY(-58.45vh);}
+    53.00% {transform: translateX(0.03vw) translateY(-59.17vh);}
+    54.00% {transform: translateX(-0.52vw) translateY(-59.87vh);}
+    55.00% {transform: translateX(-1.05vw) translateY(-60.56vh);}
+    56.00% {transform: translateX(-1.55vw) translateY(-61.23vh);}
+    57.00% {transform: translateX(-2.01vw) translateY(-61.90vh);}
+    58.00% {transform: translateX(-2.42vw) translateY(-62.56vh);}
+    59.00% {transform: translateX(-2.78vw) translateY(-63.21vh);}
+    60.00% {transform: translateX(-3.07vw) translateY(-63.85vh);}
+    61.00% {transform: translateX(-3.31vw) translateY(-64.49vh);}
+    62.00% {transform: translateX(-3.47vw) translateY(-65.12vh);}
+    63.00% {transform: translateX(-3.56vw) translateY(-65.74vh);}
+    64.00% {transform: translateX(-3.59vw) translateY(-66.36vh);}
+    65.00% {transform: translateX(-3.55vw) translateY(-66.98vh);}
+    66.00% {transform: translateX(-3.44vw) translateY(-67.59vh);}
+    67.00% {transform: translateX(-3.27vw) translateY(-68.21vh);}
+    68.00% {transform: translateX(-3.04vw) translateY(-68.82vh);}
+    69.00% {transform: translateX(-2.75vw) translateY(-69.44vh);}
+    70.00% {transform: translateX(-2.43vw) translateY(-70.06vh);}
+    71.00% {transform: translateX(-2.06vw) translateY(-70.68vh);}
+    72.00% {transform: translateX(-1.66vw) translateY(-71.31vh);}
+    73.00% {transform: translateX(-1.24vw) translateY(-71.94vh);}
+    74.00% {transform: translateX(-0.80vw) translateY(-72.58vh);}
+    75.00% {transform: translateX(-0.36vw) translateY(-73.22vh);}
+    76.00% {transform: translateX(0.07vw) translateY(-73.88vh);}
+    77.00% {transform: translateX(0.50vw) translateY(-74.54vh);}
+    78.00% {transform: translateX(0.91vw) translateY(-75.21vh);}
+    79.00% {transform: translateX(1.29vw) translateY(-75.89vh);}
+    80.00% {transform: translateX(1.64vw) translateY(-76.59vh);}
+    81.00% {transform: translateX(1.95vw) translateY(-77.29vh);}
+    82.00% {transform: translateX(2.22vw) translateY(-78.01vh);}
+    83.00% {transform: translateX(2.44vw) translateY(-78.74vh);}
+    84.00% {transform: translateX(2.61vw) translateY(-79.49vh);}
+    85.00% {transform: translateX(2.72vw) translateY(-80.25vh);}
+    86.00% {transform: translateX(2.78vw) translateY(-81.02vh);}
+    87.00% {transform: translateX(2.79vw) translateY(-81.81vh);}
+    88.00% {transform: translateX(2.75vw) translateY(-82.61vh);}
+    89.00% {transform: translateX(2.65vw) translateY(-83.43vh);}
+    90.00% {transform: translateX(2.51vw) translateY(-84.27vh);}
+    91.00% {transform: translateX(2.32vw) translateY(-85.12vh);}
+    92.00% {transform: translateX(2.09vw) translateY(-85.98vh);}
+    93.00% {transform: translateX(1.83vw) translateY(-86.86vh);}
+    94.00% {transform: translateX(1.53vw) translateY(-87.76vh);}
+    95.00% {transform: translateX(1.22vw) translateY(-88.67vh);}
+    96.00% {transform: translateX(0.89vw) translateY(-89.60vh);}
+    97.00% {transform: translateX(0.55vw) translateY(-90.54vh);}
+    98.00% {transform: translateX(0.20vw) translateY(-91.50vh);}
+    99.00% {transform: translateX(-0.14vw) translateY(-92.47vh);}
+    100.00% {transform: translateX(-0.47vw) translateY(-93.46vh);}
+}
