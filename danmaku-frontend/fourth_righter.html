@@ -28,17 +28,21 @@
                 <button data-when="Rating" onclick="onControllerCommand(GSControl.EndRating)">结束打分</button>
                 <button data-when="Gaming-Idle Answering StopAnswering" onclick="onControllerCommand(GSControl.NextRound)">下一回合</button>
                 <button data-when="Enroll Gaming-Idle Answering StopAnswering Rating" onclick="onControllerCommand(GSControl.EndGame)">结束游戏</button>
-                <div id="controller_show" class="controller_show">主持人：Admin</div>
                 <details class="ctrl_advanced">
                     <summary>高级设置</summary>
+                    <!-- 展开后浮在页面上；主持人名单也收在这里（现场不需要一直盯着看） -->
+                    <div class="ctrl_advanced_body">
+                        <div id="controller_show" class="controller_show">主持人：Admin</div>
                     <button id="add_player_btn" onclick="addPlayer()">添加玩家</button>
-                    <button id="clear_played_btn" onclick="clearPlayed()">清空已玩过</button>
+                    <button id="clear_played_btn" onclick="clearPlayed()">清空已玩</button>
                     <button id="reset_questions_btn" onclick="resetQuestions()">重置题库</button>
+                        <button id="wipe_save_btn" onclick="wipeSaveAndReload()">删除存档</button>
                     <label class="audit_toggle" title="开启后：选手的答案要等主持人贴表情才算通过，没通过的答案不参与打分">
                         <input type="checkbox" id="audit_toggle" checked onchange="setAuditEnabled(this.checked)">答案需审核
                     </label>
                     <input type="text" id="controller_nickname_input" value="Admin" oninput="setControllerNickname()">
-                    <button onclick="toggleTestSend(this)">测试弹幕</button>
+                        <button onclick="toggleTestSend(this)">测试弹幕</button>
+                    </div>
                 </details>
             </div>
             <div class="game_state_wrap_wrap">
@@ -74,17 +78,6 @@
             </div>
             <div class="character_wrap">
                 <div class="enroll_guide">孩子们，扣1报名参加</div>
-                <div class="candidates_wrap">
-                    <div class="candidates_title">
-                        <span id="candidates_status">报名中</span>
-                        <span class="candidates_counter"><span id="candidates_count">0</span> / <span id="candidates_target">12</span></span>
-                    </div>
-                    <div class="candidates_progress"><div id="candidates_progress_bar"></div></div>
-                    <div id="candidates_list" class="candidates_list"></div>
-                    <div class="played_note">
-                        已玩过 <span id="played_count">0</span> 人，本轮不再参与抽选<span id="played_names"></span>
-                    </div>
-                </div>
                 <div class="answer_guide answer_guide_1">请选手回答，观众主观打分</div>
                 <div id="question" class="question_box">
                     <div id="question_body" class="question_body">
@@ -96,6 +89,17 @@
             </div>
             <div class="players_wrap_wrap">
                 <div id="players_wrap">
+                </div>
+                <div class="candidates_wrap">
+                    <div class="candidates_title">
+                        <span id="candidates_status">报名中</span>
+                        <span class="candidates_counter"><span id="candidates_count">0</span> / <span id="candidates_target">12</span></span>
+                    </div>
+                    <div class="candidates_progress"><div id="candidates_progress_bar"></div></div>
+                    <div id="candidates_list" class="candidates_list"></div>
+                    <div class="played_note">
+                        已玩过 <span id="played_count">0</span> 人
+                    </div>
                 </div>
             </div>
             <div class="answers_wrap_wrap">
@@ -188,7 +192,6 @@
 
         // 开关式测试弹幕：点击持续发送，再点关闭
         function toggleTestSend(btn) {
-                </details>
             if (testSending) {
                 testSending = false;
                 clearTimeout(testSendTimer);

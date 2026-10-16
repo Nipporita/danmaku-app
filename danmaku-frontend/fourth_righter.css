@@ -817,7 +817,7 @@ button.next-button, button.prev-button {
 }
 
 .state_rating .answer_guide {
-    transition: opacity 1s;
+    transition: opacity 0s; /* 退出（抽选时）立即消失，不渐变 */
 }
 
 #port_input {
@@ -1232,14 +1232,20 @@ div#players_wrap {
    主区上半：报名气泡；主区下半：候选池 + 已玩过名单
    ============================================================ */
 .character_wrap .enroll_guide {
-    top: calc(50% - 5rem); /* 让出下半屏给候选池 */
+    top: 50%; /* 候选池已挪到玩家区那一列，气泡回到主区正中央（原来为了给候选池让位而 -5rem 上移） */
 }
 
+/* 报名池挪进玩家区那一列（players_wrap 系列）。
+   原来它挂在主区、相对整屏 top/left 50% 绝对居中，于是浮在屏幕正中；
+   现在铺在玩家区这一列里（位置由 .players_wrap_wrap 决定）。
+   仍用 absolute：既给 ::before 那圈内描边当定位参照，也不占玩家卡的排版空间。
+   尺寸（width / max-height / margin）在文件末尾统一覆盖。 */
 .candidates_wrap {
     position: absolute;
-    top: calc(50% - 0.6rem);
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
     width: min(46rem, 86%); /* 两侧留白要容得下"规则介绍"菱形按钮（它挂在面板右外侧） */
     max-height: 40%;
     box-sizing: border-box;
@@ -1274,6 +1280,7 @@ div#players_wrap {
 /* 只有报名阶段可见（待机/游戏中一律淡出） */
 .state_enroll .candidates_wrap {
     opacity: 1;
+    transition: opacity 0.35s; /* 进入时淡入就够了 */
 }
 
 .candidates_title {
@@ -1434,8 +1441,12 @@ div#players_wrap {
     color: #8c8c8c;
 }
 
-.player_content.audit_pending .player_answer_show {
-    color: #9a9a9a;
+/* 审核未过：答案**不上屏**（原来只是调成灰色，等于照样把答案给观众看了）。
+   用 visibility 而不是 display：保留占位，过审后不会因为显隐而跳版。
+   角标上的「待审核」会留着，主持人能看出有人交了答案，但看不到内容。 */
+.player_content.audit_pending .player_answer_show,
+.player_content.audit_pending input.player_answer {
+    visibility: hidden;
 }
 
 .player_content.audit_ok .player_score_wrap::after {
@@ -1490,4 +1501,62 @@ div#players_wrap {
         font-size: 0.75rem;
         padding: 0.12rem 0.7rem;
     }
+}
+
+/* ============================================================
+   报名池进入玩家区列后的最终尺寸（放文件末尾按顺序覆盖上面的 width / max-height）
+   ============================================================ */
+.players_wrap_wrap { position: relative; } /* 给绝对定位的报名池当参照 */
+.state_enroll .players_wrap_wrap { width: 34vw; } /* 报名时这一列放宽些，候选池更好看 */
+.candidates_wrap {
+    width: 100%;
+    max-height: 88%;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   控制面板「高级设置」：展开时浮起来，不参与布局。
+   原来 <details> 在文档流里展开，会把这根控制栏（grid 的一列）撑长，
+   连带整行被顶高 —— 所以改成：summary 留在流里当开关，内容绝对定位浮在外面。
+   主持人名单也收在浮层里（现场不需要一直看着它）。
+   ============================================================ */
+#control_panel { position: relative; }
+#control_panel details.ctrl_advanced { position: relative; }
+#control_panel details.ctrl_advanced > summary {
+    cursor: pointer;
+    opacity: 0.75;
+    padding: 0.15rem 0.3rem;
+    border: calc(2rem / 16) solid black;
+    border-radius: 0.4rem;
+    background: white;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+#control_panel .ctrl_advanced_body {
+    position: absolute;
+    left: 100%;   /* 浮在面板右侧：面板贴左缘，右边就是游戏区，空间足够 */
+    bottom: 0;    /* 贴着「高级设置」下沿往上长，不会跑出屏幕底部 */
+    top: auto;
+    margin-left: 0.45rem;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    padding: 0.6rem;
+    width: max-content;
+    max-width: 24rem;
+    max-height: 80vh;
+    overflow: auto;
+    background: white;
+    border: calc(3.5rem / 16) solid black;
+    border-radius: 0.8rem;
+    box-shadow: 0px 0px calc(11rem / 16) calc(-4rem / 16) rgba(0, 0, 0, 0.8);
+}
+#control_panel .ctrl_advanced_body .controller_show {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+    font-size: 0.9rem;
+    line-height: 1.25;
 }

@@ -217,6 +217,14 @@ function isControllerUid(uid) {
     return !!uid && !!ControllerUids[uid];
 }
 
+function isControllerPerson(senderId) {
+    // 只按 QQ 号（id:xxx）认人。
+    // ⚠ 绝不能按昵称/群名片认：同一个人的群名片在不同群不一样，而且谁都能改名，
+    //   用它判权限等于开后门（改个名就能审别人的答案）。
+    if (typeof senderId !== "string" || senderId === "") return false;
+    return isControllerUid("id:" + senderId);
+}
+
 function isControlWord(text) {
     if (typeof text !== "string") return false;
     // 群里发的控制词常被 QQ 追个表情，上游会变成 <face .../> 贴在末尾：
@@ -227,17 +235,14 @@ function isControlWord(text) {
 }
 
 function isController(uid, name, text) {
-    // 指令分发用：uid 已绑定 → 是；否则昵称与手动填写的一致**且说的是控制词**才认，
-    // 认下的同时把 uid 绑死（之后改昵称也不丢主持权）。
-    // 只按昵称就认会让"把群昵称改成 Admin"直接拿到主持权，所以加了控制词这道门槛。
+    // 指令分发用：**只认已绑定的 uid**（uid = "id:" + QQ 号）。
+    // ⚠ 以前这里还有一条后门："昵称 == 名单里的名字 + 说的是控制词 → 认下并绑定"。
+    //   可控制词（开始报名/开始打分…）是主持人在群里公开打的，原文人人可见，
+    //   于是任何人把群名片改成那个名字再发一句控制词，就能当场夺权（审/撤答案、踢人、结束游戏）。
+    //   现在只有两条路能成为主持人：后端下发的 is_admin（并集：任一配置群的群主/管理员）
+    //   自动认定，或控制面板上的本机控制台 uid。
     if (!uid) return false;
-    if (ControllerUids[uid]) return true;
-    if (name && ControllerNames[name] && isControlWord(text)) {
-        ControllerUids[uid] = true;
-        updateControllerDisplay();
-        return true;
-    }
-    return false;
+    return !!ControllerUids[uid];
 }
 
 function setControllerNickname() {
@@ -415,7 +420,7 @@ function Enroll() {
     if (rounds) rounds.innerText = CurrentRound;
     renderCandidates();
     showAddPlayerButton();
-    saveState();
+    saveStateSoon();
 }
 
 function poolTarget() {
@@ -430,17 +435,15 @@ function enrollCandidate(data) {
     if (!uid) return;
     if (isControllerUid(uid)) return; // ⑥ 主持人不能报名
     if (Played[uid] !== undefined) { // ② 已玩过的人自动排除，并在屏上给个交代
-        showHint("⏭️ " + userName(uid) + " 已经玩过啦，本轮不参与抽选");
         return;
     }
     if (Candidates.indexOf(uid) !== -1) return; // 已在池中
     if (Candidates.length >= poolTarget()) {
-        showHint("报名池已满（" + poolTarget() + " 人），" + userName(uid) + " 的 1 没挤进来");
         return;
     }
     Candidates.push(uid);
     renderCandidates();
-    saveState();
+    saveStateSoon();
     if (Candidates.length >= poolTarget()) {
         // ① 报名进度满了：直接抽选，N 张选手卡当场出现在大屏上
         autoDrawPlayers();
@@ -465,16 +468,45 @@ function eligibleCandidates() {
     });
 }
 
+function isTestFake(uid) {
+    // 测试弹幕送进来的假人：报名走 "test:"，观众投票走 "aud:"（见 fourth_righter.html 的行内脚本）。
+    // ⚠ 进池的 uid 是 uidOf() 出来的形态（"id:test:0" / "id:aud:3"），必须先剥掉前缀再判，
+    //   否则永远返回 false —— 假人会被当成真人，"真人一定上场"的规则就失效了（审计发现）。
+    if (typeof uid !== "string") return false;
+    var bare = uid.replace(/^(id|name):/, "");
+    return bare.indexOf("test:") === 0 || bare.indexOf("aud:") === 0;
+}
+
 function pickDrawn(pool, n) {
-    // 抽 n 个人。人黑名单（影子封禁）的人**永远不上台**：
-    // 宁可这局少人，也不让被禁言的人拿到话筒（指不定说出什么）。
-    // 干净的人不足 n 时就按实际人数上场，主持人可以用面板「添加玩家」补人。
-    var clean = pool.filter(function (uid) { return !ShadowBanned[uid]; });
-    var shadowCount = pool.length - clean.length;
-    var picked = sampleN(clean, Math.min(n, clean.length));
-    if (shadowCount > 0 && picked.length < n) {
-        log("⚠️ 可用报名者 " + clean.length + " 人（不足 " + n + " 人），" +
-            "影子黑名单里还有 " + shadowCount + " 人，本局不上场");
+    // 抽 n 个人。规则：
+    //   1. 影子封禁（人黑名单）的人永远不上台 —— 别让被禁言的人拿到话筒，宁可少人；
+    //   2. 真人优先，且"真人一定上场"：先把真人排满，再用测试假人补足剩余名额 ——
+    //      现场彩排常常凑不齐 4 个人，得靠假人补位才能把撤回/审核/打分这些后续环节走完；
+    //      但只要真人在，假人就绝不占真人的位置（这点由"先排真人"保证）。
+    //   3. 真人为 0 时整局都由假人上（纯测试弹幕压测）。
+    var isShadow = function (uid) { return !!ShadowBanned[uid]; };
+    var usable = pool.filter(function (uid) { return !isShadow(uid); });
+    var real = usable.filter(function (uid) { return !isTestFake(uid); });
+    var fake = usable.filter(isTestFake);
+    var picked = sampleN(real, Math.min(n, real.length));   // 先排真人（真人多于名额时随机取）
+    var filled = 0;
+    if (picked.length < n) {                                // 名额还差人 → 假人补位
+        var fill = sampleN(fake, n - picked.length);
+        filled = fill.length;
+        picked = picked.concat(fill);
+    }
+    if (picked.length > 0 && real.length === 0) {
+        log("🧪 池子里没有真人，本局 " + picked.length + " 个测试假人上场（纯测试）");
+    } else if (filled > 0) {
+        log("🧪 真人 " + real.length + " 人全部上场，另补 " + filled + " 个测试假人凑满本局");
+    }
+    if (picked.length < n) {
+        var shadowCount = pool.length - usable.length;
+        var notes = [];
+        if (fake.length === 0) notes.push("池里没有可补的测试假人");
+        if (shadowCount > 0) notes.push("影子黑名单 " + shadowCount + " 人不上场");
+        log("⚠️ 本局只有 " + picked.length + " 人上场" +
+            (notes.length ? "（" + notes.join("，") + "）" : "") + "，可用面板「添加玩家」补人");
     }
     return picked;
 }
@@ -492,9 +524,6 @@ function autoDrawPlayers() {
     seatPlayers(drawn);
     log("🎲 报名进度已满，自动抽选：" + drawn.map(userName).join("、"));
     // 少人时不点名、也不说"有人被过滤"，只报实际人数
-    showHint(drawn.length < MaxPlayers
-        ? "本局 " + drawn.length + " 人上场"
-        : "🎲 抽选完成：" + drawn.map(userName).join("、"));
 }
 
 function sampleN(list, n) {
@@ -515,7 +544,7 @@ function startGameFromPool() {
     if (!PlayersDrawn) {
         var pool = eligibleCandidates();
         if (pool.length < MinPlayers) {
-            alert("报名人数不足：至少需要 " + MinPlayers + " 人才能开局（当前 " + pool.length + " 人）。\n" +
+            log("报名人数不足：至少需要 " + MinPlayers + " 人才能开局（当前 " + pool.length + " 人）。\n" +
                   "让大家扣 1 报名，或用控制面板把人数调低。");
             return false;
         }
@@ -523,10 +552,9 @@ function startGameFromPool() {
         seatPlayers(drawn);
         log("🎲 抽选结果：" + drawn.map(userName).join("、"));
         if (drawn.length < MaxPlayers) {
-            showHint("报名没满，" + drawn.length + " 人开赛");
         }
     } else if (playerRows().length < MinPlayers) {
-        alert("上场人数不足 " + MinPlayers + " 人，无法开始");
+        log("上场人数不足 " + MinPlayers + " 人，无法开始");
         return false;
     }
     return true;
@@ -588,6 +616,31 @@ function snapshotState() {
     };
 }
 
+var SaveSoonTimer = null;
+
+function saveStateSoon() {
+    // 刷屏时每条消息都全量 JSON.stringify + 同步写 localStorage，会卡住主线程
+    // （倒计时、动画、投票都跟着抖）。这里合并成"最多每 300ms 写一次"；
+    // 页面被隐藏/关闭前会立刻补写一次，不会丢。
+    if (SaveSoonTimer) return;
+    SaveSoonTimer = setTimeout(function () {
+        SaveSoonTimer = null;
+        saveState();
+    }, 300);
+}
+
+function flushSaveSoon() {
+    if (!SaveSoonTimer) return;
+    clearTimeout(SaveSoonTimer);
+    SaveSoonTimer = null;
+    saveState();
+}
+
+window.addEventListener("pagehide", flushSaveSoon);
+document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") flushSaveSoon();
+});
+
 function saveState() {
     if (Restoring) return;
     try {
@@ -629,11 +682,16 @@ function rebuildAnswersByMessage() {
 }
 
 function roundAnswer(uid) {
-    // 本轮算数的答案 = 这个人在回答环节说的**第一条**。
-    // 主持人的表情只是「闸」，不负责挑内容；顺序完全由回答顺序决定，
-    // 所以不存在"把答案换成另一条"的余地（想换只能撤回第一条）。
+    // 本轮算数的答案 = 这个人**已过审的、最后发的那一条**（取最后，不是第一条）。
+    // 主持人给哪条贴表情，哪条就算过审；多条都过审时，以最后发的为准。
+    // 想作废某条：把它那条的表情取消（回到待审核），或把消息撤回。
+    // 「答案需审核」关掉时（彩排退路）没有审核状态可言，就按最后发的那条算。
     var records = AnswerHistory[uid] || [];
-    return records.length ? records[0] : null;
+    if (!AuditEnabled) return records.length ? records[records.length - 1] : null;
+    for (var i = records.length - 1; i >= 0; i--) {
+        if (records[i].approved) return records[i];
+    }
+    return null;
 }
 
 function gateOpen(uid) {
@@ -650,10 +708,10 @@ function playerCard(uid) {
 }
 
 function refreshPlayerCard(uid) {
-    // 卡片上显示的永远是"第一条答案"，右上角标的是闸门状态
+    // 卡片上显示的是**已过审的、最后发的那条**（没过审就什么都不显示）
     var row = playerCard(uid);
     var rec = roundAnswer(uid);
-    var open = gateOpen(uid);
+    var open = !!rec;
     var text = rec ? rec.text : "";
     if (row) {
         var answerInput = row.getElementsByClassName("player_answer")[0];
@@ -670,12 +728,15 @@ function refreshPlayerCard(uid) {
             fixTextWidth(answerShow, 0);
         }
     }
-    if (text === "") delete PlayersAnswers[uid];
-    else PlayersAnswers[uid] = {
-        text: text,
-        messageId: (rec && rec.messageId) || "",
-        approved: open,
+    // 记录（查询/存档用）始终是**最后提交**的那条，并带上它自己的审核状态；
+    // 屏上显示哪条、打分算哪条，只看 roundAnswer（已过审里最后一条）。
+    var lastRec = (AnswerHistory[uid] || []).slice(-1)[0] || null;
+    if (lastRec) PlayersAnswers[uid] = {
+        text: lastRec.text,
+        messageId: lastRec.messageId || "",
+        approved: !!lastRec.approved,
     };
+    else delete PlayersAnswers[uid];
     updatePlayerAuditInDocument();
 }
 
@@ -772,6 +833,9 @@ function restoreFromSave(save) {
             hideAddPlayerButton();
             frozenPlayers();
             frozenAnswers();
+            // ⚠ 打分用的排位数组也要重建（它只在 startRating 里建过）：
+            //   不补的话恢复后 sort().indexOf() 全是 -1 → 所有答案条 top 都算成 0%，叠在最上面。
+            Answers4Rank = Answers.slice();
             createAnswersInDocument();
             ratingRevealDone = true;
             updateAnswersScores();
@@ -863,26 +927,10 @@ function renderCandidates() {
     const playedCount = document.getElementById("played_count");
     var playedNames = Object.keys(Played).map(function (uid) { return Played[uid]; });
     if (playedCount) playedCount.innerText = playedNames.length;
-    const playedNamesEl = document.getElementById("played_names");
-    if (playedNamesEl) {
-        playedNamesEl.innerText = playedNames.length > 0 ? "：" + playedNames.join("、") : "";
-    }
 }
 
 ////////// 屏上提示（后一条直接盖掉前一条，避免刷屏）
 var HintTimer = null;
-
-function showHint(text) {
-    var el = document.getElementById("hint_wrap");
-    if (!el || !text) return;
-    el.innerText = text;
-    el.classList.add("show");
-    if (HintTimer) clearTimeout(HintTimer);
-    HintTimer = setTimeout(function () {
-        el.classList.remove("show");
-        HintTimer = null;
-    }, HINT_SECONDS * 1000);
-}
 
 function refreshUserNamesInDocument(uid) {
     // 改名后同步已上场的玩家卡显示（分数/答案都按 uid 存，不受影响）
@@ -966,14 +1014,11 @@ function countDistinctAnswers() {
 }
 
 function StopAnswering() {
-    // 答案不足（≤1 个不同答案）时没有可打分的竞争，直接进入回合间歇
-    if (countDistinctAnswers() <= 1) {
-        GameState = GS.Gaming.Idle;
-        countingDown(0); // 停止计时
-        frozenAnswers();
-        updateGameStateInDocument();
-        return;
-    }
+    // 答题时间到（或主持人提前停止答题）→ 一律进「停止回答」：
+    //   不再收答题，但**仍然收审核**（回答中 + 停止回答 是审核/撤回的窗口），
+    //   等主持人点「开始打分」。
+    // 「答案不足（≤1 条过审）→ 回合间歇」是**开始打分**那一步的判断（见 startRating），
+    // 不能在这里抢跑：否则时间一到就跳间歇，审核窗口也一起关了。
     GameState = GS.Gaming.StopAnswering;
     updateGameStateInDocument();
     frozenAnswers();
@@ -1054,17 +1099,11 @@ async function startRating() {
             }
         }
     }
-    if (Answers.length <= 1) {
-        // 答案不足（≤1 个不同答案，或审核通过的答案不够）时没有可打分的竞争，直接进入回合间歇
-        if (AuditEnabled) {
-            var raw = playerRows().filter(function (row) {
-                var input = row.getElementsByClassName("player_answer")[0];
-                return input && input.value.trim() !== "";
-            }).length;
-            if (raw > 1) {
-                showHint("已通过审核的答案不足，先给群里的答案消息贴个表情再开始打分");
-            }
-        }
+    // 流局规则（用户明确）：按**过审**算 ——
+    //   过审 0 条 → 直接流局（回合间歇）；
+    //   过审 ≥1 条 → 照常打分（1 条也能打，主持人/观众可以选择不投）。
+    // 其余没过多审的人当没答过（他们不进 Answers）。
+    if (Answers.length === 0) {
         countingDown(0); // 停止计时
         frozenAnswers();
         GameState = GS.Gaming.Idle;
@@ -1121,7 +1160,7 @@ function processNextMessage() {
             processNextMessage();  // 当前消息处理完成，继续处理下一个
         })
         .catch(err => {
-            console.error("Error in processing message:", err);
+            console.error("Error in processing message:", err, (typeof data === "object" && data) ? data.type : data);
             processNextMessage(); // 错误处理后，继续处理下一个消息
         });
 }
@@ -1154,7 +1193,8 @@ function processMessage(e) {
             }
             // 控制词/元指令匹配用的"干净文本"：把行内元素整个剔掉（不是换成 █），
             // 这样「开始报名<face id="339"/>」也能被认成控制词
-            var cleanText = stripInlineElements(data.text, "").trim();
+            var rawText = (typeof data.text === "string") ? data.text : "";
+            var cleanText = stripInlineElements(rawText, "").trim();
             var uid = uidOf(data);
             rememberUser(uid, data.sender); // 记录/刷新昵称（改名后显示名会跟着更新）
             // 人黑名单（影子封禁）：后端对"禁止用户"的每一条消息都会标 user_blacklist。
@@ -1169,7 +1209,10 @@ function processMessage(e) {
                 }
             }
             // ⑤ 群主 / 管理员自动成为主持人（后端从 Satori member.roles 带下来的 is_admin）
-            if (data.is_admin === true && uid && !ControllerUids[uid]) {
+            // 认人（只按 QQ 号）：名单里有这个号，或后端说他是群主/管理员
+            if (isControllerPerson(data.senderId)) {
+                if (uid) ControllerUids[uid] = true;
+            } else if (data.is_admin === true && uid && !ControllerUids[uid]) {
                 ControllerUids[uid] = true;
                 updateControllerDisplay();
                 log("👑 " + data.sender + " 是群管理员，已自动认定为主持人");
@@ -1243,7 +1286,7 @@ function processMessage(e) {
                 }
                 gameStateChangeFeedback();
                 updateGameStateInDocument();
-                saveState();
+                saveStateSoon();
                 resolve();
             } else {
                 if (GameState === GS.Gaming.Rating) {
@@ -1254,7 +1297,7 @@ function processMessage(e) {
                 } else if (GameState === GS.Gaming.Answering) {
                     playerAnswer(data);
                 }
-                saveState();
+                saveStateSoon();
                 resolve();
             }
         } catch (err) {
@@ -1282,16 +1325,26 @@ function handleEventFrame(frame) {
     return false;
 }
 
+function auditWindowOpen() {
+    // 审核 / 撤回的窗口：回答中，以及「停止答题 ↔ 开始打分」之间那一段（StopAnswering）。
+    // 用户明确要的就是这一段（答题已截止、还没开始打分，主持人这时候补审核）。
+    // 打分一开始（Rating）就不动答案了；回合间歇也不受理。
+    return GameState === GS.Gaming.Answering || GameState === GS.Gaming.StopAnswering;
+}
+
 function handleRecallFrame(frame) {
     // ③ 撤回：被撤回的那一条答案，在「打分开始前」（回答中 / 停止回答）从大屏消失。
     // 打分一旦开始、或已进入回合间歇，就不再受理撤回。
     // 注意是撤**那一条**：如果这位选手还发过别的答案，撤回旧答案不影响他现在生效的那条。
-    if (GameState !== GS.Gaming.Answering && GameState !== GS.Gaming.StopAnswering) return;
+    if (!auditWindowOpen()) return;
     var mid = messageIdOf(frame);
     if (!mid) return;
     var record = AnswersByMessage[mid];
     if (!record) return;
     var uid = record.uid;
+    // 这条答案的所有消息 ID 一起解绑（同文本连发多条时它们都指向这条记录）
+    var _ids = record.messageIds || (record.messageId ? [record.messageId] : []);
+    _ids.forEach(function (id) { if (id) delete AnswersByMessage[id]; });
     delete AnswersByMessage[mid];
     var records = AnswerHistory[uid] || [];
     var idx = records.indexOf(record);
@@ -1303,11 +1356,16 @@ function handleRecallFrame(frame) {
 function handleReactionFrame(frame) {
     // 观众贴表情：先在"那张答案卡上的答案上方"长出一个一模一样的表情（直播感）。
     // 回答期间、打分期间都放（答案一直挂在选手卡上）；跟「答案需审核」开关无关。
-    if (frame && frame.action !== "remove") spawnReactionFlyer(frame);
+    // ⚠ 主持人/管理员的贴表情是**审核动作**（开闸/撤回），不该在大屏上冒表情 ——
+    //   否则每审一条就飞一个表情，既吵又等于把审核时机告诉观众。
+    var _flyerUid = uidOf({ senderId: frame && frame.sender_id, sender: frame && frame.sender });
+    var _flyerIsController = !!(frame && (frame.is_admin === true ||
+        (_flyerUid && isControllerUid(_flyerUid))));
+    if (frame && frame.action !== "remove" && !_flyerIsController) spawnReactionFlyer(frame);
     // ④ 答题审核：主持人给某条答案贴了表情（任意表情都算通过）
     if (!AuditEnabled) return;
-    // 打分一开始就不再受理审核（回答中 / 停止回答 → 打分前都可以补贴）
-    if (GameState !== GS.Gaming.Answering && GameState !== GS.Gaming.StopAnswering) return;
+    // 审核窗口与撤回一致：回答中 / 答题截止后 / 回合间歇都受理（打分开始后不动答案）
+    if (!auditWindowOpen()) return;
     var mid = messageIdOf(frame);
     if (!mid) return;
     var record = AnswersByMessage[mid];
@@ -1318,13 +1376,15 @@ function handleReactionFrame(frame) {
     var reactor = uidOf({ senderId: frame.sender_id, sender: frame.sender });
     // 后端的贴表情帧带着「贴的人是不是群管理员」（成员角色缓存），
     // 主持人只在控制面板上操作、从没在群里发过言时，靠这一条就地认人
-    if (frame.is_admin === true && reactor && !ControllerUids[reactor]) {
-        ControllerUids[reactor] = true;
+    // 认人（只按 QQ 号）：名单里有这个号，或后端说他是群主/管理员
+    var reactorIsController = isControllerPerson(frame.sender_id);
+    if (frame.is_admin === true && reactor) {
+        ControllerUids[reactor] = true;   // 就地认人（reactor 是 id:xxx 形态）
         updateControllerDisplay();
+        reactorIsController = true;
     }
-    if (!isControllerUid(reactor)) {
+    if (!reactorIsController) {
         log("🙅 非主持人贴的表情不算审核：" + (userName(reactor) || "未知"));
-        showHint("收到贴表情，但 " + (frame.sender || "对方") + " 还不是主持人，审核没生效");
         return;
     }
     // QQ 里表情是可以取消的（Satori reaction-removed / OneBot is_add=false）：
@@ -1406,22 +1466,24 @@ function spawnReactionFlyer(frame) {
 
     var el = document.createElement("div");
     el.className = "reaction_fly";
-    if (url) {
+    // 优先画**字符**：QQ 的「贴表情」就是标准 emoji（👍😂❤️ 这些），
+    // QQ 自己也是拿系统 emoji 字体画的 —— 画字符才和你在 QQ 里看到的一致。
+    // 之前优先用 emoji_url，而标准 emoji 的图是 Twemoji（Twitter 风格），
+    // 所以现场看着"和 QQ 里的不太一样"。
+    // 经典 QQ 表情（微笑/火车那些）没有字符、只有 qzonestyle 的图，那种才用图。
+    if (ch) {
+        el.classList.add("reaction_fly_text");
+        // 用 textContent 而不是 innerText：jsdom（我们的测试宿主）不实现 innerText，
+        // 浏览器里两者在这里完全等价。
+        el.textContent = ch;
+    } else if (url) {
         var img = document.createElement("img");
         img.src = url;
-        img.alt = ch || "";
-        // 图挂了（网络受限 / Twemoji 里没有这个新 emoji）就退回字符
+        img.alt = "";
         img.onerror = function () {
             if (img.parentNode) img.parentNode.removeChild(img);
-            if (ch) {
-                el.classList.add("reaction_fly_text");
-                el.innerText = ch;
-            }
         };
         el.appendChild(img);
-    } else {
-        el.classList.add("reaction_fly_text");
-        el.innerText = ch;
     }
     var rect = anchor.getBoundingClientRect();
     // 从答案**上方**长出来（水平居中于那条答案）
@@ -1447,25 +1509,16 @@ function spawnReactionFlyer(frame) {
 }
 
 function approveAnswer(record) {
-    // 主持人给**这一条**答案贴了表情 = 开闸（放这位选手的答案过关）。
-    // 闸只有一个、跟着"最后一次贴的那条消息"走，但**内容**永远是回答顺序上的第一条：
-    // 所以贴哪一条都不改变答案文本，不给"改答案"留余地。
+    // 主持人给**这一条**答案贴了表情 = 这一条过审（不是"开一个闸"）。
+    // 多条都过审没问题：算数的那条由 roundAnswer 取「已过审里最后发的」。
     if (!record) return;
-    (AnswerHistory[record.uid] || []).forEach(function (r) {
-        if (r !== record) {
-            r.approved = false;
-            r.approvedAt = 0;
-        }
-    });
     record.approved = true;
     record.approvedAt = ++ApprovalSeq;
     refreshPlayerCard(record.uid);
     var rec = roundAnswer(record.uid);
     var content = rec ? rec.text : record.text;
     var face = record.emojiChar ? (record.emojiChar + " ") : "";
-    showHint("✅ " + face + userName(record.uid) + " 的答案已通过审核：" + content +
-        (rec && rec !== record ? "（本轮以他第一条答案为准）" : ""));
-    saveState();
+    saveStateSoon();
 }
 
 function unapproveAnswer(record) {
@@ -1474,24 +1527,29 @@ function unapproveAnswer(record) {
     record.approved = false;
     record.approvedAt = 0;
     refreshPlayerCard(record.uid);
-    showHint("↩️ 已取消审核：" + userName(record.uid) +
-        (gateOpen(record.uid) ? "" : "（回到待审核）"));
-    saveState();
+    saveStateSoon();
 }
 
 function setAuditEnabled(on) {
     AuditEnabled = !!on;
     syncAuditCheckbox();
+    // 审核开关变了，卡片上算数的那条答案也跟着变（关掉审核就没有审核状态可言了）
+    playerRows().forEach(function (row) {
+        var uid = rowUid(row);
+        if (uid) refreshPlayerCard(uid);
+    });
     updatePlayerAuditInDocument();
     saveState();
 }
 
 function updatePlayerAuditInDocument() {
-    // 玩家卡右上角标「待审核」；已通过则标一个绿色对勾
+    // 玩家卡右上角标「待审核」；已通过则标一个绿色对勾。
+    // ⚠ 有没有答案要看**记录**，不能看输入框的值：没过审时输入框是空的（答案不上屏），
+    //   但"这个人答过了、等你审核"这个信息必须让主持人看到。
     playerRows().forEach(function (row) {
-        var input = row.getElementsByClassName("player_answer")[0];
-        var hasAnswer = input && input.value !== "";
-        var approved = !!(input && input.dataset && input.dataset.approved === "1");
+        var uid = rowUid(row);
+        var hasAnswer = (AnswerHistory[uid] || []).length > 0;
+        var approved = !!roundAnswer(uid);
         row.classList.remove("audit_pending", "audit_ok");
         if (!AuditEnabled || !hasAnswer) return;
         row.classList.add(approved ? "audit_ok" : "audit_pending");
@@ -1510,7 +1568,10 @@ var INLINE_PLACEHOLDER = "█";
 var INLINE_TAG_PATTERN = /<(face|mface|marketface|image|record|voice|video|file|json|xml|reply|at|poke|forward|node|markdown)\b[^<>]*\/?>/gi;
 
 function stripInlineElements(text, replacement) {
-    if (typeof text !== "string" || text.indexOf("<") === -1) return text;
+    // 非字符串（事件帧/系统帧可能只有 sender、没有 text）一律当空文本，
+    // 否则调用方一句 .trim() 就会把整条消息队列打挂（现场正是死在这里）
+    if (typeof text !== "string") return "";
+    if (text.indexOf("<") === -1) return text;
     if (replacement === undefined) replacement = INLINE_PLACEHOLDER;
     return text.replace(INLINE_TAG_PATTERN, replacement);
 }
@@ -1708,7 +1769,7 @@ function applyMaxPlayers(target) {
     if (newMax === MaxPlayers) return;
     var count = playerRows().length;
     if (newMax < count) {
-        alert("当前已有 " + count + " 名玩家，无法降低到 " + newMax + "，请先删除多余玩家");
+        log("当前已有 " + count + " 名玩家，无法降低到 " + newMax + "，请先删除多余玩家");
         return;
     }
     MaxPlayers = newMax;
@@ -1736,11 +1797,13 @@ function updatePlayersWrapClass() {
 
 function addPlayer(name = "", uid = null) {
     if (playerRows().length >= MaxPlayers) {
-        alert("已达到最大玩家数");
+        log("已达到最大玩家数");
         return null;
     }
 
-    if (playerNamesInDocument().includes("")) {
+    // 只挡"第二张空名卡"：原来只要场上已有一张空名卡，后面**所有**卡都加不进来，
+    // 于是存档里若有一张空名卡，恢复时它之后的选手全部丢失（审计发现）。
+    if (name === "" && playerNamesInDocument().includes("")) {
         return null;
     }
 
@@ -1985,21 +2048,19 @@ function playerAnswer(data) {
     // 记录进"这个人的答案历史"，而不是覆盖掉上一条 —— 上一条要留着，
     // 主持人可能给上一条贴表情（"审核选了第一个上去"）
     var records = AnswerHistory[uid] || (AnswerHistory[uid] = []);
-    var last = records[records.length - 1];
-    if (last && !last.approved && last.text === panswer) {
-        // 同一句话又发了一遍（重发/手滑）：认作同一条，只更新消息 ID，不堆历史
-        if (last.messageId) delete AnswersByMessage[last.messageId];
-        last.messageId = mid;
-        last.at = Date.now();
-    } else {
-        records.push({ uid: uid, text: panswer, messageId: mid, approved: false, at: Date.now() });
-    }
+    // 答案**完全独立**：每条消息各记一条（同一个人连发多条一样的，也算多条）。
+    // 好处：主持人贴**哪一条**，哪一条就过审（算数的那条由 roundAnswer 取"已过审里最后发的"）；
+    //       撤回哪一条就删哪一条。
+    records.push({
+        uid: uid, text: panswer, messageId: mid, messageIds: mid ? [mid] : [],
+        approved: false, at: Date.now(),
+    });
     if (mid) AnswersByMessage[mid] = records[records.length - 1];
     refreshPlayerCard(uid);
-    // 一个人说了多条：以**第一条**为准（主持人只是闸，不换内容）
+    // 一个人说了多条：全都留着，算数的那条由 roundAnswer 决定 ——
+    // 已过审里最后发的那条（主持人贴哪条哪条过审；都没过审就都不上屏）。
     if (records.length > 1) {
-        log("ℹ️ " + userName(uid) + " 本轮已答过，后说的内容不替换答案：" + records[records.length - 1].text);
-        showHint("ℹ️ " + userName(uid) + " 又答了一条，本轮仍以第一条为准：" + records[0].text);
+        log("ℹ️ " + userName(uid) + " 本轮又答了一条，以过审的最后一条为准");
     }
 }
 
@@ -2190,4 +2251,30 @@ window.addEventListener("resize", scheduleRefitQuestionTexts);
 window.addEventListener("orientationchange", scheduleRefitQuestionTexts);
 if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
     document.fonts.ready.then(function () { refitQuestionTexts(); });
+}
+
+// 页面是 index.html 拼装注入的，脚本执行时 #control_panel 可能还没进 DOM，
+// 所以这里等它出现后自己跑一次：让状态按钮一开始就只显示当前有效的那些。
+(function initPanelButtons() {
+    var tries = 0;
+    (function tick() {
+        if (document.getElementById("control_panel")) { updatePanelButtons(); return; }
+        if (++tries < 60) setTimeout(tick, 50);
+    })();
+})();
+
+// 「删除存档（并刷新）」：现场常要「从头来一遍」，清掉整局存档再刷新页面 ——
+// 比手点一串按钮可靠（存档里还带着报名池、答案、回合、审核状态等）
+function wipeSaveAndReload() {
+    // 直接删存档并刷新：现场要的就是一键「从头来一遍」，不要任何弹窗
+    try {
+        clearSave();
+    } catch (e) {
+        console.warn("清存档失败:", e);
+    }
+    try {
+        location.reload();
+    } catch (e) {
+        // 某些宿主（例如测试用的 jsdom）不实现 reload，忽略即可
+    }
 }
