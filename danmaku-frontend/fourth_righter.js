@@ -2027,7 +2027,24 @@ function removeAnswersInDocument() {
     answersWrap.innerHTML = ""; // 清空
 }
 
+// 控制面板：按当前游戏状态，只显示有效的操作按钮。
+// 每个按钮用 data-when="状态1 状态2" 声明允许的状态；没写 data-when 的按钮始终显示。
+function updatePanelButtons() {
+    var panel = document.getElementById("control_panel");
+    if (!panel) return;
+    var list = panel.querySelectorAll("[data-when]");
+    for (var i = 0; i < list.length; i++) {
+        var el = list[i];
+        var allowed = String(el.getAttribute("data-when") || "").split(/\s+/);
+        var show = allowed.indexOf(GameState) !== -1;
+        if (el.classList) {
+            el.classList.toggle("ctrl_hidden", !show);
+        }
+    }
+}
+
 function updateGameStateInDocument() {
+    updatePanelButtons();   // 控制面板只留当前状态下有效的按钮
     const stateElement = document.getElementById("game_state");
     const mainContent = document.getElementById("main_content");
     if (GameState === GS.Idle) {

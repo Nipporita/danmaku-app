@@ -8,26 +8,38 @@
         <style>
             /* 模板注入的每日抽签元素，游戏页不需要展示 */
             #omikuji {display: none;}
+
+            /* 控制面板：按游戏状态隐藏无效按钮；不常用的收进「高级设置」折叠块 */
+            .ctrl_hidden {display: none !important;}
+            #control_panel details.ctrl_advanced {margin-left: .5em;}
+            #control_panel details.ctrl_advanced > summary {cursor: pointer; opacity: .7;}
+            #control_panel details.ctrl_advanced button,
+            #control_panel details.ctrl_advanced .audit_toggle,
+            #control_panel details.ctrl_advanced input[type="text"] {margin: .2em .3em;}
         </style>
     </head>
     <body>
         <div id="main_content" class="state_idle">
             <div id="control_panel" class="control_wrap">
-                <button id="add_player_btn" onclick="addPlayer()">添加玩家</button>
-                <button id="clear_played_btn" onclick="clearPlayed()">清空已玩过</button>
-                <button id="reset_questions_btn" onclick="resetQuestions()">重置题库</button>
-                <label class="audit_toggle" title="开启后：选手的答案要等主持人贴表情才算通过，没通过的答案不参与打分">
-                    <input type="checkbox" id="audit_toggle" checked onchange="setAuditEnabled(this.checked)">答案需审核
-                </label>
-                <input type="text" id="controller_nickname_input" value="Admin" oninput="setControllerNickname()">
+                <!-- 状态按钮：只显示当前状态下有效的（data-when 列出允许的状态，运行时自动隐藏其余） -->
+                <button data-when="Idle" onclick="onControllerCommand(GSControl.StartEnroll)">开始报名</button>
+                <button data-when="Enroll" onclick="onControllerCommand(GSControl.StartGame)">开始游戏</button>
+                <button data-when="Answering StopAnswering" onclick="onControllerCommand(GSControl.StartRating)">开始打分</button>
+                <button data-when="Rating" onclick="onControllerCommand(GSControl.EndRating)">结束打分</button>
+                <button data-when="Gaming-Idle Answering StopAnswering" onclick="onControllerCommand(GSControl.NextRound)">下一回合</button>
+                <button data-when="Enroll Gaming-Idle Answering StopAnswering Rating" onclick="onControllerCommand(GSControl.EndGame)">结束游戏</button>
                 <div id="controller_show" class="controller_show">主持人：Admin</div>
-                <button onclick="onControllerCommand(GSControl.StartEnroll)">开始报名</button>
-                <button onclick="onControllerCommand(GSControl.StartGame)">开始游戏</button>
-                <button onclick="onControllerCommand(GSControl.StartRating)">开始打分</button>
-                <button onclick="onControllerCommand(GSControl.EndRating)">结束打分</button>
-                <button onclick="onControllerCommand(GSControl.NextRound)">下一回合</button>
-                <button onclick="onControllerCommand(GSControl.EndGame)">结束游戏</button>
-                <button onclick="toggleTestSend(this)">测试弹幕</button>
+                <details class="ctrl_advanced">
+                    <summary>高级设置</summary>
+                    <button id="add_player_btn" onclick="addPlayer()">添加玩家</button>
+                    <button id="clear_played_btn" onclick="clearPlayed()">清空已玩过</button>
+                    <button id="reset_questions_btn" onclick="resetQuestions()">重置题库</button>
+                    <label class="audit_toggle" title="开启后：选手的答案要等主持人贴表情才算通过，没通过的答案不参与打分">
+                        <input type="checkbox" id="audit_toggle" checked onchange="setAuditEnabled(this.checked)">答案需审核
+                    </label>
+                    <input type="text" id="controller_nickname_input" value="Admin" oninput="setControllerNickname()">
+                    <button onclick="toggleTestSend(this)">测试弹幕</button>
+                </details>
             </div>
             <div class="game_state_wrap_wrap">
                 <div class="game_state_wrap">
@@ -176,6 +188,7 @@
 
         // 开关式测试弹幕：点击持续发送，再点关闭
         function toggleTestSend(btn) {
+                </details>
             if (testSending) {
                 testSending = false;
                 clearTimeout(testSendTimer);
