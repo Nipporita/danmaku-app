@@ -5,9 +5,9 @@
         <meta name="viewport" content="width=device-width initial-scale=1">
         <!-- 本页部署在局域网、走明文 HTTP：这条 CSP 会把同源静态资源升级成 https、把 ws:// 升级成 wss://，直接打断页面资源和大屏连弹幕姬的连接，因此移除（按 nekocast 部署实践）。 -->
         <title>幻想指南</title>
-        <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
         <!-- 局域网部署：不依赖 CDN 字体（lxgw-wenkai-webfont@1.1.0），回退系统字体 -->
         <!-- Lite version -->
         <!-- 局域网部署：不依赖 CDN 字体（lxgw-wenkai-lite-webfont@1.1.0），回退系统字体 -->
@@ -15,7 +15,7 @@
         <!-- 局域网部署：不依赖 CDN 字体（lxgw-wenkai-tc-webfont@1.0.0），回退系统字体 -->
         <!-- Screen version -->
         <!-- 局域网部署：不依赖 CDN 字体（lxgw-wenkai-screen-webfont@1.1.0），回退系统字体 -->
-        <link rel="manifest" href="/images/favicon/site.webmanifest">
+        <link rel="manifest" href="images/favicon/site.webmanifest">
         <!-- <link rel="stylesheet" href="/template/newyear.css"> -->
         <link rel="stylesheet" href="normal.css">
         <link rel="stylesheet" href="abnormal.css">
@@ -410,7 +410,7 @@
           }
 
         $.ajax({
-            url: "/template/omikuji.json",
+            url: "omikuji.json",
             type: "GET",
             dataType: "json",
             success: function (data) {

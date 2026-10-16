@@ -85,8 +85,13 @@ class DevHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
     def log_message(self, fmt, *args):
-        # 静默 /__livereload 轮询日志，其余照常
-        if "/__livereload" in (args[0] if args else ""):
+        # 静默 /__livereload 轮询日志，其余照常。
+        # ⚠ args[0] 不一定是字符串：send_error() 走的是 log_error() -> log_message()，
+        #   那里 args[0] 是 HTTPStatus 枚举，直接 `in` 会抛
+        #   TypeError: argument of type 'HTTPStatus' is not iterable，
+        #   于是"处理 404"这一步自己崩掉，满屏 traceback。所以先 str() 一下。
+        first = str(args[0]) if args else ""
+        if "/__livereload" in first or ".well-known" in first:
             return
         super().log_message(fmt, *args)
 
