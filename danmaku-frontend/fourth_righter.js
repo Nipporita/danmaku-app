@@ -37,6 +37,10 @@ var log = console.log
 ///// WS 部分
 let ws = null;
 let reconnectTimer = null;
+// ⚠ 这一组是**本地彩排**的默认值（localhost + 本地后端）。
+//   正式部署时由 tools 侧的 ~/deploy-yuanhuo-page.sh 改写：
+//   它会同时改这里的 let 值和 fourth_righter.html 里两个输入框的默认值
+//   —— 真正生效的是**输入框**，别只改这里。
 let path = "弹幕群";
 let port = 8000;
 const WS_URL_Head = "ws://localhost";
